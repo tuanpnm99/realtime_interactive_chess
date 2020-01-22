@@ -196,7 +196,7 @@ class ChessRules{
     var moves_up = ChessRules.move_to_direction(-1, 0, piece, board);
     var moves_down = ChessRules.move_to_direction(1, 0, piece, board);
     var moves_left = ChessRules.move_to_direction(0, -1, piece, board);
-    var moves_right = ChessRules.move_to_direction(-1, 0, piece, board);
+    var moves_right = ChessRules.move_to_direction(0, 1, piece, board);
     var moves = moves_up.concat(moves_down, moves_left, moves_right);
     return moves;
   }
