@@ -169,10 +169,13 @@ class ChessRules{
       var padding = move_padding[i];
       var next_row = piece.pos.row + padding[0]*direction;
       var next_col = piece.pos.col + padding[1]*direction;
-      if(!ChessRules.is_valid_to_move(next_row, next_col, piece, board))
+      if(!ChessRules.is_valid_pos(next_row, next_col, board))
         continue;
       //Special for pawn: if move diagional => some opponent piece of chess have to be present
       if(padding[0]*padding[1] != 0 && board[next_row][next_col] == null)
+        continue;
+      //Spcial for pawn: If move up, cannot move if blocked
+      if(padding[0]*padding[1] == 0 && board[next_row][next_col] != null)
         continue;
       moves.push(new Pos(next_row, next_col));
     }
