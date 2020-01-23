@@ -11,6 +11,8 @@ app.get('/', function(req, res){
 });
 var ROOM_IDS = {};
 
+//Changes by Khanh
+
 function random_id(){
   var length = Math.floor(Math.random()*3) + 5;
   var id = []
