@@ -70,7 +70,8 @@ io.on('connection', function(socket){
     //Make sure user has entered the chess room
     var rooms = Object.keys(socket.rooms);
     if(rooms.length != 2){
-        io.to(socket.id).emit('msg', get_response(false, "You entered more than 1 room", null));
+        io.to(socket.id).emit('msg', get_response(true, null, {msg:"You entered more than 1 room"}));
+        return;
     };
 
     var chess_room = rooms[0];
@@ -83,20 +84,20 @@ io.on('connection', function(socket){
     var row1 = parseInt(move[0]), col1 = parseInt(move[1]), row2 = parseInt(move[2]), col2 = parseInt(move[3]);
 
     if(isNaN(row1) || isNaN(col1) || isNaN(row2) || isNaN(col2)){
-      io.to(socket.id).emit('msg', get_response(false, "Invalid Move", null));
+      io.to(socket.id).emit('msg', get_response(true, null, {msg:"Move: Invalid Position"}));
       return;
     }
 
     var move_result = game.move(row1, col1, row2, col2);
     console.log(move_result);
-    var response = get_response(true, null, {message: msg, details: ROOM_IDS[chess_room]});
-    socket.to(chess_room).emit('msg', response);
-    io.to(socket.id).emit('join', response);
+    var response = get_response(true, null, {details: ROOM_IDS[chess_room]});
+    socket.to(chess_room).emit('render', response);
+    io.to(socket.id).emit('render', response);
   });
   socket.on('get_avail_move', function(pos){
     var rooms = Object.keys(socket.rooms);
     if(rooms.length != 2){
-        io.to(socket.id).emit('msg', get_response(false, "You entered more than 1 room", null));
+        io.to(socket.id).emit('msg', get_response(true, null, {msg:"You entered more than 1 room"}));
         return;
     };
     var chess_room = rooms[0];
@@ -107,7 +108,7 @@ io.on('connection', function(socket){
     var pos = pos.split(',');
     var row = pos[0], col = pos[1];
     if(isNaN(row) || isNaN(col)){
-      io.to(socket.id).emit('msg', get_response(false, "Get Availabile moves: Invalid Position ", null));
+      io.to(socket.id).emit('msg', get_response(true, null, {msg: "Get Availabile moves: Invalid Position "}));
       return;
     }
     var avail_moves = game.available_moves(row, col);
