@@ -189,7 +189,7 @@ class ChessRules{
     while(ChessRules.is_valid_pos(next_row, next_col, board)){
       if(board[next_row][next_col] != null){
         if(board[next_row][next_col].is_player1 != piece.is_player1){
-          move.push(new Pos(next_row, next_col));
+          moves.push(new Pos(next_row, next_col));
         }
         break;
       }
