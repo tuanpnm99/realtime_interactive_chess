@@ -37,7 +37,7 @@ class Chess{
       throw "Invalid type of chess piece!";
     }
     var pos = piece.pos;
-    if(pos.row >= this.board.length|| pos.col >= this.board.length){
+    if(!ChessRules.is_valid_pos(pos.row, pos.col, this.board)){
       throw "Chess piece is out of range!";
     }
     if(this.board[pos.row][pos.col] != null){
@@ -55,6 +55,10 @@ class Chess{
     return ChessRules.move(next_row, next_col, piece, this);
   }
   available_moves(row, col){
+    if(!ChessRules.is_valid_pos(row, col, this.board) || this.board[row][col] == null){
+      return [];
+    }
+    var piece = this.board[row][col];
     return ChessRules.available_moves(piece, this)
   }
   toString(){
@@ -169,13 +173,10 @@ class ChessRules{
       var padding = move_padding[i];
       var next_row = piece.pos.row + padding[0]*direction;
       var next_col = piece.pos.col + padding[1]*direction;
-      if(!ChessRules.is_valid_pos(next_row, next_col, board))
+      if(!ChessRules.is_valid_to_move(next_row, next_col, piece, board))
         continue;
       //Special for pawn: if move diagional => some opponent piece of chess have to be present
       if(padding[0]*padding[1] != 0 && board[next_row][next_col] == null)
-        continue;
-      //Spcial for pawn: If move up, cannot move if blocked
-      if(padding[0]*padding[1] == 0 && board[next_row][next_col] != null)
         continue;
       moves.push(new Pos(next_row, next_col));
     }
@@ -186,12 +187,8 @@ class ChessRules{
     var next_col = piece.pos.col  + col_padding;
     var moves = [];
     while(ChessRules.is_valid_pos(next_row, next_col, board)){
-      if(board[next_row][next_col] != null){
-        if(board[next_row][next_col].is_player1 != piece.is_player1){
-          moves.push(new Pos(next_row, next_col));
-        }
+      if(board[next_row][next_col] != null)
         break;
-      }
       moves.push(new Pos(next_row, next_col));
 
       next_row = next_row + row_padding;
@@ -219,7 +216,7 @@ class ChessRules{
     var moves_up = ChessRules.move_to_direction(-1, 0, piece, board);
     var moves_down = ChessRules.move_to_direction(1, 0, piece, board);
     var moves_left = ChessRules.move_to_direction(0, -1, piece, board);
-    var moves_right = ChessRules.move_to_direction(0, 1, piece, board);
+    var moves_right = ChessRules.move_to_direction(-1, 0, piece, board);
     var moves_up_left = ChessRules.move_to_direction(-1, -1, piece, board);
     var moves_up_right = ChessRules.move_to_direction(-1, 1, piece, board);
     var moves_down_left = ChessRules.move_to_direction(1, -1, piece, board);
@@ -232,7 +229,7 @@ class ChessRules{
     var pos = piece.pos;
     var type = piece.type;
     if(!chess.current_pieces.has(piece) || board[pos.row][pos.col] != piece){
-      throw "The piece does not exist in the current board";
+      return [];
     }
     switch(piece.type){
       case "king":
