@@ -66,7 +66,7 @@ io.on('connection', function(socket){
     console.log('join the room: ' + join_room);
     var response = get_response(true, null, {room: join_room, details: ROOM_IDS[join_room]});
     io.to(socket.id).emit('join', response);
-    socket.to(chess_room).emit('render', response);
+    socket.to(join_room).emit('render', response);
     io.to(socket.id).emit('render', response);
   })
   socket.on('move', function(pos){
