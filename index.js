@@ -7,7 +7,6 @@ const CHAR = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
-  //res.sendFile(__dirname + '/launch.html');
 });
 var ROOM_IDS = {};
 
@@ -67,24 +66,55 @@ io.on('connection', function(socket){
     console.log('join the room: ' + join_room);
     io.to(socket.id).emit('join', get_response(true, null, {room: join_room, details: ROOM_IDS[join_room]}));
   })
-  socket.on('msg', function(msg){
+  socket.on('move', function(pos){
     //Make sure user has entered the chess room
-    var socket_rooms = socket.rooms;
-    var rooms = Object.keys(socket_rooms);
-    if(rooms.length != 2) return;
+    var rooms = Object.keys(socket.rooms);
+    if(rooms.length != 2){
+        io.to(socket.id).emit('msg', get_response(false, "You entered more than 1 room", null));
+    };
+
     var chess_room = rooms[0];
     if(chess_room == socket.id) chess_room = rooms[1];
 
-    console.log('Message from: ' + socket.id + " " + msg);
+    console.log('Move from: ' + socket.id + " " + pos);
     console.log("Room number: " + chess_room);
-    var move = msg.split(',');
     var game = ROOM_IDS[chess_room].chess;
-    var result = game.move(parseInt(move[0]),parseInt(move[1]),parseInt(move[2]),parseInt(move[3]));
-    console.log(result);
+    var move = pos.split(',');
+    var row1 = parseInt(move[0]), col1 = parseInt(move[1]), row2 = parseInt(move[2]), col2 = parseInt(move[3]);
+
+    if(isNaN(row1) || isNaN(col1) || isNaN(row2) || isNaN(col2)){
+      io.to(socket.id).emit('msg', get_response(false, "Invalid Move", null));
+      return;
+    }
+
+    var move_result = game.move(row1, col1, row2, col2);
+    console.log(move_result);
     var response = get_response(true, null, {message: msg, details: ROOM_IDS[chess_room]});
     socket.to(chess_room).emit('msg', response);
-    io.to(socket.id).emit('msg', response);
+    io.to(socket.id).emit('join', response);
   });
+  socket.on('get_avail_move', function(pos){
+    var rooms = Object.keys(socket.rooms);
+    if(rooms.length != 2){
+        io.to(socket.id).emit('msg', get_response(false, "You entered more than 1 room", null));
+        return;
+    };
+    var chess_room = rooms[0];
+    if(chess_room == socket.id) chess_room = rooms[1];
+
+    var game = ROOM_IDS[chess_room].chess;
+
+    var pos = pos.split(',');
+    var row = pos[0], col = pos[1];
+    if(isNaN(row) || isNaN(col)){
+      io.to(socket.id).emit('msg', get_response(false, "Get Availabile moves: Invalid Position ", null));
+      return;
+    }
+    var avail_moves = game.available_moves(row, col);
+    io.to(socket.id).emit('get_avail_move', get_response(true, null, {moves: avail_moves}));
+
+
+  })
   socket.on('disconnect', function(){
     console.log('user disconnected');
   })
