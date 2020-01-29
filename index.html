@@ -11,13 +11,104 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+
+      #chessBoard{
+        /* display: inline-block; */
+        /* border: 2px outset lightGray; */
+        text-align: center;
+        font-size: 50px;
+      }
+
+      #chessBoard tr{
+          /* line-height: 1px; */
+      }
+
+      #chessBoard td{
+          /* display: inline-block; */
+          width: 64px;
+          height: 64px;
+      }
+
+      #chessBoard tr:nth-child(odd) td:nth-child(even),
+      #chessBoard tr:nth-child(even) td:nth-child(odd){
+          background-color: brown;
+      }
+      #chessBoard tr:nth-child(even) td:nth-child(even),
+      #chessBoard tr:nth-child(odd) td:nth-child(odd){
+          background-color: snow;
+      }
     </style>
   </head>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script>
+  <script type="text/javascript">
+    const chessMapping = {
+      "black":{
+        "rock": "&#9820;",
+        "knight": "&#9822;",
+        "bishop": "&#9821;",
+        "queen": "&#9819;",
+        "king": "&#9818;",
+        "pawn": "&#9823;"
+      },
+      "white":{
+        "rock": "&#9814;",
+        "knight": "&#9816;",
+        "bishop": "&#9815;",
+        "queen": "&#9813;",
+        "king": "&#9812;",
+        "pawn": "&#9817;"
+      }
+    }
+
     $(function(){
       var socket = io();
+
+      var clicked_cnt = 0;
+      var clicked_pos = null;
+      render_board = function(server_board) {
+        var table = document.getElementById("chessBoard");
+        table.innerHTML = "";
+        var size = server_board.length;
+        for (var i=0; i<size; i++) {
+          var row = table.appendChild(document.createElement("tr"));
+          for (var j=0; j<size; j++) {
+            var piece = document.createElement("td");
+            var server_piece = server_board[i][j];
+            var piece_value = "";
+            var id = i + "," + j;
+            if(server_piece != null) {
+                var is_black = server_piece.is_player1;
+                if(is_black)
+                  piece_value = chessMapping["black"][server_piece.type];
+                else
+                  piece_value = chessMapping["white"][server_piece.type];
+            }
+            piece.id = id;
+            piece.innerHTML = piece_value
+            piece.onclick = on_click;
+            row.appendChild(piece);
+          }
+        }
+      }
+      on_click = function() {
+        console.log(this.id);
+        var pos = this.id.split(",");
+        if(clicked_cnt == 0){
+          clicked_cnt++;
+          clicked_pos = pos;
+        }
+        else{
+          var pos_source = clicked_pos;
+          var pos_des = pos;
+          var move_string = pos_source[0] + ',' + pos_source[1] + ',' + pos_des[0] + ',' + pos_des[1];
+          socket.emit('msg', move_string);
+
+          clicked_pos = null;
+          clicked_cnt = 0;
+        }
+      }
+
       $('form').submit(function(e){
         e.preventDefault(); //prevent page reloading
         var room = $('#m').val();
@@ -34,9 +125,9 @@
       })
       socket.on('msg', function(response){
         if(response.success){
-          $("#result").html("new move from your opponent: " + response.data.message);
-          console.log(response.data.details);
-
+          $("#msg").val(response.data.msg);
+          var server_board = response.data.details.chess.board;
+          render_board(server_board);
         }
         else{
           $("#result").html("Error from msg channel");
@@ -66,5 +157,9 @@
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
+
+    <div id="chessBoard">
+    </div>
+
   </body>
 </html>

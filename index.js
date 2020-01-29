@@ -1,5 +1,4 @@
 var app = require('express')();
-var url = require('url');
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 const Chess = require('./chess.js');
@@ -8,10 +7,9 @@ const CHAR = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
+  //res.sendFile(__dirname + '/launch.html');
 });
 var ROOM_IDS = {};
-
-//Changes by Khanh
 
 function random_id(){
   var length = Math.floor(Math.random()*3) + 5;
@@ -80,10 +78,12 @@ io.on('connection', function(socket){
     console.log('Message from: ' + socket.id + " " + msg);
     console.log("Room number: " + chess_room);
     var move = msg.split(',');
-    var game = ROOM_IDS[chess_room].chess
-    console.log(game.move(parseInt(move[0]),parseInt(move[1]),parseInt(move[2]),parseInt(move[3])));
-    socket.to(chess_room).emit('msg', get_response(true, null, {message: msg, details: game.toString()}));
-
+    var game = ROOM_IDS[chess_room].chess;
+    var result = game.move(parseInt(move[0]),parseInt(move[1]),parseInt(move[2]),parseInt(move[3]));
+    console.log(result);
+    var response = get_response(true, null, {message: msg, details: ROOM_IDS[chess_room]});
+    socket.to(chess_room).emit('msg', response);
+    io.to(socket.id).emit('msg', response);
   });
   socket.on('disconnect', function(){
     console.log('user disconnected');
