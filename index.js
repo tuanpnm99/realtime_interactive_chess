@@ -64,7 +64,10 @@ io.on('connection', function(socket){
     }
     socket.join(join_room);
     console.log('join the room: ' + join_room);
-    io.to(socket.id).emit('join', get_response(true, null, {room: join_room, details: ROOM_IDS[join_room]}));
+    var response = get_response(true, null, {room: join_room, details: ROOM_IDS[join_room]});
+    io.to(socket.id).emit('join', response);
+    socket.to(chess_room).emit('render', response);
+    io.to(socket.id).emit('render', response);
   })
   socket.on('move', function(pos){
     //Make sure user has entered the chess room
@@ -93,6 +96,7 @@ io.on('connection', function(socket){
     var response = get_response(true, null, {details: ROOM_IDS[chess_room]});
     socket.to(chess_room).emit('render', response);
     io.to(socket.id).emit('render', response);
+
   });
   socket.on('get_avail_move', function(pos){
     var rooms = Object.keys(socket.rooms);
