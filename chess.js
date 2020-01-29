@@ -72,6 +72,7 @@ class Chess{
     return board_string.join("\n");
   }
 }
+
 class Piece{
   constructor(type, row, col, is_player1=true){
     //Player 1 is in the upper side of the board
