@@ -11,6 +11,9 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+      .selected{
+        background: green;
+      }
 
       #chessBoard{
         /* display: inline-block; */
@@ -63,7 +66,7 @@
 
     $(function(){
       var socket = io();
-
+      var game = null;
       var clicked_cnt = 0;
       var clicked_pos = null;
       render_board = function(server_board) {
@@ -92,18 +95,19 @@
         }
       }
       on_click = function() {
-        console.log(this.id);
         var pos = this.id.split(",");
+
         if(clicked_cnt == 0){
           clicked_cnt++;
           clicked_pos = pos;
+          socket.emit('get_avail_move', this.id);
+          this.style.background = "orange";
         }
         else{
           var pos_source = clicked_pos;
           var pos_des = pos;
           var move_string = pos_source[0] + ',' + pos_source[1] + ',' + pos_des[0] + ',' + pos_des[1];
-          socket.emit('msg', move_string);
-
+          socket.emit('move', move_string);
           clicked_pos = null;
           clicked_cnt = 0;
         }
@@ -120,18 +124,32 @@
       $("#msgbtn").on("click", function(){
         var msg = $('#msg').val();
         console.log(msg);
-        socket.emit('msg', msg);
+        socket.emit('move', msg);
         $('#msg').val('');
+      })
+      socket.on('get_avail_move', function(response){
+        var moves = response.data.moves;
+        console.log(moves);
+        for (var ele=0; ele<moves.length; ele++) {
+          var row = moves[ele].row;
+          var col = moves[ele].col;
+          var id = row + "," + col;
+          document.getElementById(id).style.background = "yellow";
+        }
       })
       socket.on('msg', function(response){
         if(response.success){
           $("#msg").val(response.data.msg);
-          var server_board = response.data.details.chess.board;
-          render_board(server_board);
+
         }
         else{
-          $("#result").html("Error from msg channel");
+          $("#msg").html("Error from msg channel");
         }
+      })
+      socket.on('render', function(response){
+        game = response.data.details.chess;
+        render_board(game.board);
+
       })
       socket.on('join', function(response){
         console.log(response)
