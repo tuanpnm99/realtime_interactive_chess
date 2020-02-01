@@ -15,11 +15,35 @@
         background: green;
       }
 
+      #forfeit {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-decoration: none;
+        font-size: 15px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+
       #chessBoard{
         /* display: inline-block; */
         /* border: 2px outset lightGray; */
+        position: absolute;
         text-align: center;
-        font-size: 50px;
+        font-size: 4em;
+        /* margin-left:480px;
+        margin-top: 60px; */
+        margin-left: 34%;
+        margin-top: 4.25%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        /* margin-top:-325px; */
+      }
+
+      #result {
+        display: flex;
+        justify-content: center;
+        font-size: 2em;
       }
 
       #chessBoard tr{
@@ -93,6 +117,7 @@
             row.appendChild(piece);
           }
         }
+        document.getElementById("forfeit").style.display = "inline-block";
       }
       on_click = function() {
         var pos = this.id.split(",");
@@ -154,7 +179,7 @@
       socket.on('join', function(response){
         console.log(response)
         if(response.success){
-          $("#result").html("entered room numner: " + response.data.room);
+          $("#result").html("Entered room numner: " + response.data.room);
         }
         else{
           $("#result").html(response.error);
@@ -168,16 +193,16 @@
     <div id="result">
 
     </div>
-    <div>
+    <!-- <div>
         <input id="msg" value=""><button id="msgbtn">Move</button>
-    </div>
-    <ul id="messages"></ul>
+    </div> -->
+    <!-- <ul id="messages"></ul> -->
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
 
-    <div id="chessBoard">
+    <div class="cointainer" id="chessBoard">
     </div>
-
+    <div style="text-align:center;"><button id="forfeit">Forfeit</button></div>
   </body>
 </html>
