@@ -78,12 +78,14 @@ class Chess{
 }
 
 class Piece{
-  constructor(type, row, col, is_player1=true){
+  constructor(type, row, col, is_player1=true, move_cnt=0){
     //Player 1 is in the upper side of the board
     //Player 2 is in the lower side of the board
     this.type = type.toLowerCase();
     this.pos = new Pos(row, col);
     this.is_player1 = is_player1;
+    this.move_cnt = move_cnt;
+
   }
   toString(){
     var player = '1';
@@ -167,7 +169,12 @@ class ChessRules{
   static pawn_moves(piece, board){
     var moves = [];
     var direction = 1;
-    var move_padding = [[1, 1], [1, 0], [2, 0], [1, -1]];
+    var move_padding = [[1, 1], [1, 0], [1, -1]];
+
+    if(piece.move_cnt == 0){ //special for paw: on the first move, pawn can go up to 2 rows
+      move_padding.push([2, 0]);
+    }
+    
     if(!piece.is_player1)
       direction = -1
     for(var i = 0; i < move_padding.length; i++){
@@ -285,7 +292,9 @@ class ChessRules{
     board[next_row][next_col] = piece;
     piece.pos.row = next_row;
     piece.pos.col = next_col;
+    piece.move_cnt += 1;
     chess.p1_turn = !chess.p1_turn;
+
     return [true, "Success!"];
   }
 }
