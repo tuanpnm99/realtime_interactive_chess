@@ -8,7 +8,7 @@ class Chess{
     this.removed_pieces_p2 = new Set();
     this.current_pieces = new Set();
     this.p1_turn = true;
-
+    
     pieces.forEach((piece) => {
       this.add_piece(piece);
     });
@@ -174,7 +174,7 @@ class ChessRules{
     if(piece.move_cnt == 0){ //special for paw: on the first move, pawn can go up to 2 rows
       move_padding.push([2, 0]);
     }
-    
+
     if(!piece.is_player1)
       direction = -1
     for(var i = 0; i < move_padding.length; i++){
