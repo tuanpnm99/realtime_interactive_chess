@@ -40,7 +40,7 @@
         /* margin-top:-325px; */
       }
 
-      #result {
+      .status {
         display: flex;
         justify-content: center;
         font-size: 2em;
@@ -90,7 +90,9 @@
 
     $(function(){
       var socket = io();
-      var game = null;
+      var room = null;
+      var msg = null;
+      var is_p1 = null;
       var clicked_cnt = 0;
       var clicked_pos = null;
       render_board = function(server_board) {
@@ -125,8 +127,15 @@
         if(clicked_cnt == 0){
           clicked_cnt++;
           clicked_pos = pos;
-          socket.emit('get_avail_move', this.id);
+
           this.style.background = "orange";
+          var r = parseInt(pos[0]);
+          var c = parseInt(pos[1]);
+          var avail_moves = room.chess.board[r][c].available_moves;
+          for (var i = 0; i < avail_moves.length; i++) {
+            var id = avail_moves[i].row + "," + avail_moves[i].col;
+            document.getElementById(id).style.background = "yellow";
+          }
         }
         else{
           var pos_source = clicked_pos;
@@ -135,64 +144,88 @@
           socket.emit('move', move_string);
           clicked_pos = null;
           clicked_cnt = 0;
+
+
         }
       }
+      function update_status(text){
+        $("#msg" ).html(text);
+      }
+      function update_game_status(){
+        var game_status = room.chess.game_status
 
+        if(game_status == room.chess.P1_WIN || game_status == room.chess.P2_WIN){
+          p1_win = (game_status == room.chess.P1_WIN)? true: false;
+          if(is_p1 && p1_win){
+            $("#game_status").html("You win!!");
+          }
+          else{
+            $("#game_status").html("Checkmate! You lose :(");
+          }
+          return;
+        }
+
+        if(room.chess.is_check == true){
+          if(is_p1 == room.chess.p1_turn)
+            $("#game_status").html("You are in check");
+          else
+            $("#game_status").html("Your opponent are in check!");
+        }
+        else{
+          $("#game_status").html("");
+        }
+      }
+      function update_room_status(){
+        $("#room").html("Room Number: " + room.room_number);
+        update_game_status();
+        if(msg != null){
+          update_status(msg);
+
+        }
+
+      }
       $('form').submit(function(e){
         e.preventDefault(); //prevent page reloading
         var room = $('#m').val();
         console.log('user enter: ' +room);
-        socket.emit('join', room);
+        if(room == 'CREATE')
+          socket.emit('create');
+        else
+          socket.emit('join', room);
         $('#m').val('');
         return false;
       });
-      $("#msgbtn").on("click", function(){
-        var msg = $('#msg').val();
-        console.log(msg);
-        socket.emit('move', msg);
-        $('#msg').val('');
-      })
-      socket.on('get_avail_move', function(response){
-        var moves = response.data.moves;
-        console.log(moves);
-        for (var ele=0; ele<moves.length; ele++) {
-          var row = moves[ele].row;
-          var col = moves[ele].col;
-          var id = row + "," + col;
-          document.getElementById(id).style.background = "yellow";
-        }
-      })
       socket.on('msg', function(response){
-        if(response.success){
-          $("#msg").val(response.data.msg);
-
-        }
-        else{
-          $("#msg").html("Error from msg channel");
-        }
+        update_status(response.data.msg);
       })
       socket.on('render', function(response){
-        game = response.data.details.chess;
-        render_board(game.board);
-
+        console.log("Request to render", response)
+        room = response.data.details;
+        msg = response.data.msg;
+        is_p1 = response.data.is_p1
+        render_board(room.chess.board);
+        update_room_status();
       })
       socket.on('join', function(response){
-        console.log(response)
         if(response.success){
-          $("#result").html("Entered room numner: " + response.data.room);
         }
         else{
-          $("#result").html(response.error);
+          update_status(response.error)
         }
       });
-
     });
 
   </script>
   <body>
-    <div id="result">
+    <div class="status" id="room">
 
     </div>
+    <div class= "status" id="msg">
+    </div>
+    <div class= "status" id="game_status">
+    </div>
+
+
     <!-- <div>
         <input id="msg" value=""><button id="msgbtn">Move</button>
     </div> -->
@@ -202,6 +235,7 @@
     </form>
 
     <div class="cointainer" id="chessBoard">
+
     </div>
     <div style="text-align:center;"><button id="forfeit">Forfeit</button></div>
   </body>
