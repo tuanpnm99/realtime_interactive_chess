@@ -95,6 +95,24 @@
       var is_p1 = null;
       var clicked_cnt = 0;
       var clicked_pos = null;
+      function get_pos_id(row, col){
+        return row + "," + col;
+      }
+      function display_last_move(){
+        console.log(room.chess)
+        var prev_moves = room.chess.prev_moves;
+        if(prev_moves.length == 0)
+          return;
+        var from = prev_moves[prev_moves.length-1].from;
+        var to = prev_moves[prev_moves.length-1].to;
+
+        var from_id = get_pos_id(from.row, from.col);
+        var to_id = get_pos_id(to.row, to.col);
+        document.getElementById(from_id).style.background = "green";
+        document.getElementById(to_id).style.background = "green";
+
+      }
+
       render_board = function(server_board) {
         var table = document.getElementById("chessBoard");
         table.innerHTML = "";
@@ -118,8 +136,10 @@
             piece.onclick = on_click;
             row.appendChild(piece);
           }
+
         }
         document.getElementById("forfeit").style.display = "inline-block";
+        display_last_move();
       }
       on_click = function() {
         var pos = this.id.split(",");
