@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/tuanpnm99/realtime_interactive_chess#readme",
   "dependencies": {
+    "cookie-session": "^1.4.0",
     "express": "^4.17.1",
     "http": "0.0.0",
     "socket.io": "^2.3.0"

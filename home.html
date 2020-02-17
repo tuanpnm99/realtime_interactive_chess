@@ -117,12 +117,12 @@
   socket = null;
   $(function(){
     socket = io();
-    console.log("HOME", socket);
+
     $("#join").on("click", function(){
       var room = $('#room_id').val();
       $('#room_id').val('');
       console.log("Join room " + room);
-      socket.emit('join', room);
+      socket.emit('join_home_page', room);
     });
     $("#create").on("click", function(){
       console.log("Create room");

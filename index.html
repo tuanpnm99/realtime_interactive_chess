@@ -5,12 +5,6 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
       .selected{
         background: green;
       }
@@ -90,6 +84,7 @@
 
     $(function(){
       var socket = io();
+      socket.emit("join_game_page");
       var room = null;
       var msg = null;
       var is_p1 = null;
@@ -138,7 +133,7 @@
           }
 
         }
-        document.getElementById("forfeit").style.display = "inline-block";
+        //document.getElementById("forfeit").style.display = "inline-block";
         display_last_move();
       }
       on_click = function() {
@@ -245,18 +240,9 @@
     <div class= "status" id="game_status">
     </div>
 
-
-    <!-- <div>
-        <input id="msg" value=""><button id="msgbtn">Move</button>
-    </div> -->
-    <!-- <ul id="messages"></ul> -->
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-
     <div class="cointainer" id="chessBoard">
 
     </div>
-    <div style="text-align:center;"><button id="forfeit">Forfeit</button></div>
+    <!-- <div style="text-align:center;"><button id="forfeit">Forfeit</button></div> -->
   </body>
 </html>

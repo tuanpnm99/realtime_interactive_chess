@@ -1,28 +1,43 @@
 var app = require('express')();
 var http = require('http').createServer(app);
+
 var io = require('socket.io')(http);
-//var session = require('client-sessions');
+
+const session = require('cookie-session')({
+    name: 'interactive-chess-game',
+    secret: 'dasdas0i-23mkjda0-123'
+});
 
 const Chess = require('./chess.js');
 const ROOT = '/';
 const CHAR = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const PORT = process.env.PORT || 5000;
-//
-// app.use(session({
-//     cookieName: 'session',
-//     secret: 'asdfasdf23423',
-//     duration: 30 * 60 * 1000,
-//     activeDuration: 5 * 60 * 1000,
-// }));
-
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
-app.get('/game_page', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-})
 var ROOMS_STATE = {};
 var USER_TO_ROOM = {};
+
+
+app.get('/', function(req, res){
+  session(req, res, () => {
+    if(req.session.user_id == null || !USER_TO_ROOM.hasOwnProperty(req.session.user_id)){
+      req.session.user_id = new_user_id();
+      USER_TO_ROOM[req.session.user_id] = null;
+    }
+    else
+      res.redirect("/game_page");
+  })
+  console.log("FROM /",   req.session.user_id);
+  res.sendFile(__dirname + '/home.html');
+});
+
+app.get('/game_page', function(req, res){
+  session(req, res, () => {
+    if(req.session.user_id == null || !USER_TO_ROOM.hasOwnProperty(req.session.user_id))
+      res.redirect("/");
+  })
+  res.sendFile(__dirname + '/index.html');
+})
+
+
 function random_id(){
   var length = Math.floor(Math.random()*3) + 5;
   var id = []
@@ -30,6 +45,13 @@ function random_id(){
     id.push(CHAR[Math.floor(Math.random()*CHAR.length)]);
   }
   return id.join('');
+}
+function new_user_id(){
+  var id = random_id();
+  while(USER_TO_ROOM.hasOwnProperty(id)){
+    id = random_id();
+  }
+  return id;
 }
 function new_room_number(){
   var id = random_id();
@@ -50,9 +72,7 @@ function get_response(success, error, data){
 }
 function create_new_room(){
   room = new_room_number();
-  console.log(room);
   var new_game = new Chess();
-  console.log(new_game);
   ROOMS_STATE[room] = {
     room_number: room,
     p1: null,
@@ -62,62 +82,113 @@ function create_new_room(){
   }
   return room;
 }
-function is_valid_to_join(room){
-  var rooms = get_rooms();
-  if(!rooms[room] || rooms[room].length == 2)
-    return false;
-  return true;
-}
 io.on('connection', function(socket){
+
+  let cookieString = socket.request.headers.cookie;
+  let req = {connection: {encrypted: false}, headers: {cookie: cookieString}}
+  let res = {getHeader: () =>{}, setHeader: () => {}};
+  session(req, res, () => {});
+
+
   console.log('a user connected with id: ' + socket.id);
 
   socket.on('create', function(){
-    new_room = create_new_room();
+    console.log("FROM CREATE", req.session, req.session.user_id);
+    var user_id = req.session.user_id;
 
-    ROOMS_STATE[new_room].p1 = socket.id;
-    USER_TO_ROOM[socket.id] = new_room;
+    console.log(USER_TO_ROOM)
+    //should not enter here
+    if(!user_id || !USER_TO_ROOM.hasOwnProperty(user_id)){
+      console.log("Holly");
+      io.to(socket.id).emit('join', get_response(false, "Something wrong happen, please refresh the page", null));
+      return;
+    }
+
+    var new_room = create_new_room();
+
+    ROOMS_STATE[new_room].p1 = user_id;
+    USER_TO_ROOM[user_id] = new_room;
     console.log('create the room: ' + new_room);
+    console.log(USER_TO_ROOM);
     socket.join(new_room);
 
     var response = get_response(true, null, {details: ROOMS_STATE[new_room]});
-
-
     io.to(socket.id).emit('join', '/game_page');
 
-    io.to(socket.id).emit('render', response);
   })
-  socket.on('join', function(room){
+  socket.on('join_home_page', function(room){
+    console.log("FROM JOIN", req.session, req.session.user_id);
     console.log('some one want to join: ' + room);
-    if(!is_valid_to_join(room)){
-      io.to(socket.id).emit('join', get_response(false, "Room does not exist or full, please create new room", null));
+    var user_id = req.session.user_id;
+    if(!user_id || !USER_TO_ROOM.hasOwnProperty(user_id) || USER_TO_ROOM[user_id] != null){
+      io.to(socket.id).emit('msg', get_response(false, "Something wrong happen, please refresh the page", null));
       return;
     }
-    var join_room = room;
-    ROOMS_STATE[join_room].p2 = socket.id;
-    ROOMS_STATE[join_room].pause = false;
 
-    USER_TO_ROOM[socket.id] = join_room;
-    socket.join(join_room);
 
-    console.log('join the room: ' + join_room);
+    if(!ROOMS_STATE.hasOwnProperty(room) || ROOMS_STATE[room].p1 != null && ROOMS_STATE[room].p2 != null){
+      io.to(socket.id).emit('msg', get_response(false, "Room does not exists or full, please enter a valid room ID", null));
+      return;
+    }
 
-    var response = get_response(true, null, {room: join_room, details: ROOMS_STATE[join_room]});
+    if(ROOMS_STATE[room].p1 == null){
+      ROOMS_STATE[room].p1 = user_id;
+    }
+    else{
+      ROOMS_STATE[room].p2 = user_id;
+    }
+    USER_TO_ROOM[user_id] = room;
 
-    io.to(socket.id).emit('join', response);
+    io.to(socket.id).emit('join', "/game_page");
 
-    socket.to(join_room).emit('render', response);
+  })
+  socket.on('join_game_page', function(){
+    console.log("FROM JOIN game page", req.session.user_id);
+    console.log(USER_TO_ROOM);
+    var user_id = req.session.user_id;
+
+    //should not enter here
+    if(!user_id || !USER_TO_ROOM.hasOwnProperty(user_id) || USER_TO_ROOM[user_id] == null){
+      io.to(socket.id).emit('join', get_response(false, "Something wrong happen, please refresh the page", null));
+      return;
+    }
+    var room = USER_TO_ROOM[user_id];
+
+    if(user_id != ROOMS_STATE[room].p1 && user_id != ROOMS_STATE[room].p2){
+      io.to(socket.id).emit('render', get_response(true, null, {msg:"Something wrong happen, please rejoin the room"}));
+      return;
+    }
+    socket.join(room);
+
+    var msg = null;
+    //if the room is full, ready to start
+    if(ROOMS_STATE[room].p1 != null && ROOMS_STATE[room].p2 != null){
+      ROOMS_STATE[room].pause = false;
+      msg = "Ready to start!";
+    }
+
+    var response = get_response(true, null, {room: room, msg: msg, details: ROOMS_STATE[room]});
+
+    socket.to(room).emit('render', response);
     io.to(socket.id).emit('render', response);
-
 
   })
   socket.on('move', function(pos){
+
+    var user_id = req.session.user_id;
+
+    //should not enter here
+    if(!user_id || !USER_TO_ROOM.hasOwnProperty(user_id)){
+      io.to(socket.id).emit('join', get_response(false, "Something wrong happen, please refresh the page", null));
+      return;
+    }
     //Make sure user has entered the chess room
-    if(!USER_TO_ROOM.hasOwnProperty(socket.id)){
+    if(USER_TO_ROOM[user_id] == null){
       io.to(socket.id).emit('msg', get_response(true, null, {msg:"You did not enter any room, please create or join a room"}));
       return;
     }
 
-    var room = USER_TO_ROOM[socket.id];
+    var room = USER_TO_ROOM[user_id];
     var game = ROOMS_STATE[room].chess;
 
     if(ROOMS_STATE[room].pause == true){
@@ -125,13 +196,13 @@ io.on('connection', function(socket){
       return;
     }
     //another checking, this should not be true
-    if(socket.id != ROOMS_STATE[room].p1 && socket.id != ROOMS_STATE[room].p2){
+    if(user_id != ROOMS_STATE[room].p1 && user_id != ROOMS_STATE[room].p2){
       io.to(socket.id).emit('render', get_response(true, null, {details: ROOMS_STATE[room], msg:"Something wrong happen, please rejoin the room"}));
       return;
     }
 
     //check for the turn
-    var is_player1 = (socket.id == ROOMS_STATE[room].p1)? true: false;
+    var is_player1 = (user_id == ROOMS_STATE[room].p1)? true: false;
     if(is_player1 != game.p1_turn){
       io.to(socket.id).emit('render', get_response(true, null, {details: ROOMS_STATE[room], msg:"This is your opponent turn, please wait!"}));
       return;
@@ -162,17 +233,19 @@ io.on('connection', function(socket){
 
   });
   socket.on('disconnect', function(){
-    if(USER_TO_ROOM.hasOwnProperty(socket.id)){
-      var room = USER_TO_ROOM[socket.id];
-      //remove user from room state
-      if(ROOMS_STATE[room].p1 == socket.id)
-        ROOMS_STATE[room].p1 = null;
-      else if(ROOMS_STATE[room].p2 == socket.id)
-        ROOMS_STATE[room].p2 = null;
-
-      //delete the mapping
-      delete USER_TO_ROOM[socket.id];
-    }
+    // var user_id = req.session.user_id;
+    // if(USER_TO_ROOM.hasOwnProperty(user_id)){
+    //   var room = USER_TO_ROOM[user_id];
+    //
+    //   //remove user from room state
+    //   if(room != null && ROOMS_STATE[room].p1 == user_id)
+    //     ROOMS_STATE[room].p1 = null;
+    //   else if(room != null && ROOMS_STATE[room].p2 == user_id)
+    //     ROOMS_STATE[room].p2 = null;
+    //
+    //   //delete the mapping
+    //   delete USER_TO_ROOM[user_id];
+    // }
 
     console.log('user disconnected');
   })
