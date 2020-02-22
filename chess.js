@@ -389,8 +389,6 @@ class ChessRules{
     return moves;
   }
   static available_moves(piece, board){
-    var pos = piece.pos;
-    var type = piece.type;
     switch(piece.type){
       case "king":
         return ChessRules.king_moves(piece, board);

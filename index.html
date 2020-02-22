@@ -211,7 +211,7 @@
         return false;
       });
       socket.on('msg', function(response){
-        update_status(response.data.msg);
+        update_status(response.error);
       })
       socket.on('render', function(response){
         console.log("Request to render", response)
