@@ -1,13 +1,12 @@
 var GameManager = require('./gameManager.js');
 var RoomManager = require('./roomManager.js');
-var Chess = require('./chess.js');
+var {Chess} = require('./chess.js');
 class RequestHandler{
   constructor(){
     this.GAME_MANAGER = new GameManager(this);
     this.ROOM_MANAGER = new RoomManager(this);
 
-    //for random generator
-    this.CHAR = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
   }
   authenticate_user(user_id){ //public
     return this.ROOM_MANAGER.authenticate_user(user_id);
@@ -33,7 +32,7 @@ class RequestHandler{
         success: false,
         msg: "You did not enter a room!"
       };
-
+      
     return this.GAME_MANAGER.make_move(move_string, user_id, room);
   }
   is_player1(user_id){ //public
@@ -48,15 +47,6 @@ class RequestHandler{
   new_chess_game(){ //internal
     return new Chess();
   }
-  generate_random_id(){ //might need a new class in the future
-    var length = Math.floor(Math.random()*3) + 5;
-    var id = []
-    for(var i = 0; i < length; i++){
-      id.push(this.CHAR[Math.floor(Math.random()*this.CHAR.length)]);
-    }
-    return id.join('');
-  }
-
 
 }
 

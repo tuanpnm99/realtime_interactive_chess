@@ -5,6 +5,9 @@ class RoomManager{
     this.ROOMS_STATE = {};
     this.REQUEST_HANDLER = request_handler;
     this.max_size = size;
+    //for random generator
+    this.CHAR = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
   }
   authenticate_user(user_id){ //public
     if(!this.is_user_exist(user_id))
@@ -21,8 +24,13 @@ class RoomManager{
     var auth_result = this.authenticate_user(user_id);
     if(!auth_result.success)
       return auth_result;
-
-
+      
+    if(this.USER_TO_ROOM[user_id] != null && this.USER_TO_ROOM[user_id] != room_id){
+      return{
+        success: false,
+        msg: "You have already join a different room"
+      }
+    }
     if(!this.valid_room_to_join(user_id, room_id))
       return {
         success:false,
@@ -38,7 +46,7 @@ class RoomManager{
         room.p2 = user_id;
     }
     this.USER_TO_ROOM[user_id] = room_id;
-    var msg = "Success to join!"
+    var msg = "Success to join!";
     if(this.is_full(room_id)){
       room.pause = false;
       msg = "Ready to start the game!";
@@ -59,15 +67,15 @@ class RoomManager{
         msg: "We have filled all rooms! Please try again later!"
       };
 
+    if(this.USER_TO_ROOM[user_id] != null){
+      return{
+        success: false,
+        msg: "You have already join a room"
+      }
+    }
     var new_id = this.get_new_room_id();
 
-    if(this.is_room_exist(new_id)) //should not enter here
-      return {
-        success: false,
-        msg: "Something wrong happen, Please try again!"
-      };
-
-      var new_game = this.REQUEST_HANDLER.new_chess_game();
+    var new_game = this.REQUEST_HANDLER.new_chess_game();
       this.ROOMS_STATE[new_id] = {
         room_number: new_id,
         p1: user_id,
@@ -133,18 +141,26 @@ class RoomManager{
     return true;
   }
   get_new_user_id(){
-    var new_id = this.REQUEST_HANDLER.generate_random_id();
+    var new_id = this.generate_random_id();
     while(this.is_user_exist(new_id)){
-      new_id = this.REQUEST_HANDLER.generate_random_id();
+      new_id = this.generate_random_id();
     }
     return new_id;
   }
   get_new_room_id(){
-    var new_id = this.REQUEST_HANDLER.generate_random_id();
+    var new_id = this.generate_random_id();
     while(this.is_room_exist(new_id)){
-      new_id = this.REQUEST_HANDLER.generate_random_id();
+      new_id = this.generate_random_id();
     }
     return new_id;
+  }
+  generate_random_id(){ //might need a new class in the future
+    var length = Math.floor(Math.random()*3) + 5;
+    var id = []
+    for(var i = 0; i < length; i++){
+      id.push(this.CHAR[Math.floor(Math.random()*this.CHAR.length)]);
+    }
+    return id.join('');
   }
 }
 

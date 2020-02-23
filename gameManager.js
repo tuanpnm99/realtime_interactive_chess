@@ -3,6 +3,8 @@ class GameManager{
     this.REQUEST_HANDLER = request_handler;
   }
   parse_move(move_str){
+    if(move_str == null || typeof(move_str) != 'string')
+      return  null;
     move_str = move_str.split(',');
     var row1 = parseInt(move_str[0]), col1 = parseInt(move_str[1]), row2 = parseInt(move_str[2]), col2 = parseInt(move_str[3]);
     return [row1, col1, row2, col2];
@@ -11,6 +13,13 @@ class GameManager{
     return (user_id == room.p1)? true: false;
   }
   valid_to_make_move(user_id, room){
+
+    if(room == null)
+      return {
+        success: false,
+        msg: "Invalid room"
+      };
+      
     if(room.p1 != user_id && room.p2 != user_id)
       return {
         success: false,
@@ -24,11 +33,7 @@ class GameManager{
         msg: "This is your opponent turn, please wait!"
       }
 
-    if(room == null)
-      return {
-        success: false,
-        msg: "Invalid room"
-      };
+
 
     if(room.pause == true)
       return {
@@ -49,7 +54,7 @@ class GameManager{
       return valid_check;
     var move = this.parse_move(move_string);
 
-    if(isNaN(move[0]) || isNaN(move[1]) || isNaN(move[2]) || isNaN(move[3])){
+    if(move == null|| isNaN(move[0]) || isNaN(move[1]) || isNaN(move[2]) || isNaN(move[3])){
       return {
         success: false,
         msg: "Invalid move format!"
@@ -60,7 +65,7 @@ class GameManager{
 
     var result = game.move(move[0], move[1], move[2], move[3]);
 
-    console.log(result);
+    //console.log(result);
 
     return {
       success: result[0],
