@@ -6,10 +6,18 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       .selected{
-        background: green;
+        border: green;
       }
 
       td {
+        border: hidden;
+      }
+
+      #from_id {
+        border: hidden;
+      }
+
+      #to_id {
         border: hidden;
       }
 
@@ -30,12 +38,9 @@
         position: absolute;
         text-align: center;
         font-size: 4em;
-        /* margin-left:480px;
-        margin-top: 60px; */
         margin-left: 34%;
         margin-top: 4.25%;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        /* margin-top:-325px; */
       }
 
       .status {
@@ -107,8 +112,8 @@
 
         var from_id = get_pos_id(from.row, from.col);
         var to_id = get_pos_id(to.row, to.col);
-        document.getElementById(from_id).style.background = "green";
-        document.getElementById(to_id).style.background = "green";
+        document.getElementById(from_id).style.border = "5px solid green";
+        document.getElementById(to_id).style.border = "5px solid green";
 
       }
 
@@ -244,7 +249,7 @@
     <div class= "status" id="game_status">
     </div>
 
-    <div class="cointainer" id="chessBoard">
+    <div class='ui-responsive' id="chessBoard">
 
     </div>
     <!-- <div style="text-align:center;"><button id="forfeit">Forfeit</button></div> -->
