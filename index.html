@@ -9,6 +9,10 @@
         background: green;
       }
 
+      td {
+        border: hidden;
+      }
+
       #forfeit {
         background-color: #4CAF50;
         border: none;
@@ -143,13 +147,13 @@
           clicked_cnt++;
           clicked_pos = pos;
 
-          this.style.background = "orange";
+          this.style.border = "5px solid orange";
           var r = parseInt(pos[0]);
           var c = parseInt(pos[1]);
           var avail_moves = room.chess.board[r][c].available_moves;
           for (var i = 0; i < avail_moves.length; i++) {
             var id = avail_moves[i].row + "," + avail_moves[i].col;
-            document.getElementById(id).style.background = "yellow";
+            document.getElementById(id).style.border = "5px solid yellow";
           }
         }
         else{
