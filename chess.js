@@ -427,4 +427,7 @@ class ChessRules{
     return false;
   }
 }
-module.exports = Chess;
+module.exports = {
+  Chess,
+  Piece
+};
