@@ -1,94 +1,45 @@
 <!doctype html>
 <html>
+  <!-- <script src="https://code.jquery.com/jquery-1.11.1.js"></script> -->
   <head>
     <title>Interactive Chess Game</title>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      .selected{
-        border: green;
-      }
 
-      td {
-        border: hidden;
-      }
-
-      #from_id {
-        border: hidden;
-      }
-
-      #to_id {
-        border: hidden;
-      }
-
-      #forfeit {
-        background-color: #4CAF50;
-        border: none;
-        color: white;
-        padding: 15px 32px;
-        text-decoration: none;
-        font-size: 15px;
-        margin: 4px 2px;
-        cursor: pointer;
-      }
+      body { font: "Times New Roman", Times, serif; }
 
       #chessBoard{
-        /* display: inline-block; */
-        /* border: 2px outset lightGray; */
-        position: absolute;
-        text-align: center;
-        font-size: 4em;
-        margin-left: 34%;
-        margin-top: 4.25%;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-      }
-
-      .status {
-        display: flex;
-        justify-content: center;
-        font-size: 2em;
-      }
-
-      #chessBoard tr{
-          /* line-height: 1px; */
+        font-size: 3em;
       }
 
       #chessBoard td{
-          /* display: inline-block; */
-          width: 64px;
-          height: 64px;
+          width: 1.8em !important;
+          height: 1.8em !important;
       }
 
       #chessBoard tr:nth-child(odd) td:nth-child(even),
       #chessBoard tr:nth-child(even) td:nth-child(odd){
-          background-color: brown;
+          background-color: rgb(160,82,45);
+          border: 1px solid black;
       }
       #chessBoard tr:nth-child(even) td:nth-child(even),
       #chessBoard tr:nth-child(odd) td:nth-child(odd){
-          background-color: snow;
+          background-color: rgb(222,184,135);
+          border: 1px solid black;
       }
     </style>
   </head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/d9c3597be6.js" crossorigin="anonymous"></script>
   <script src="/socket.io/socket.io.js"></script>
-  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
   <script type="text/javascript">
     const chessMapping = {
-      "black":{
-        "rock": "&#9820;",
-        "knight": "&#9822;",
-        "bishop": "&#9821;",
-        "queen": "&#9819;",
-        "king": "&#9818;",
-        "pawn": "&#9823;"
-      },
-      "white":{
-        "rock": "&#9814;",
-        "knight": "&#9816;",
-        "bishop": "&#9815;",
-        "queen": "&#9813;",
-        "king": "&#9812;",
-        "pawn": "&#9817;"
-      }
+      "rock": "fa-chess-rook",
+      "knight": "fa-chess-knight",
+      "bishop": "fa-chess-bishop",
+      "queen": "fa-chess-queen",
+      "king": "fa-chess-king",
+      "pawn": "fa-chess-pawn"
     }
 
     $(function(){
@@ -103,7 +54,6 @@
         return row + "," + col;
       }
       function display_last_move(){
-        console.log(room.chess)
         var prev_moves = room.chess.prev_moves;
         if(prev_moves.length == 0)
           return;
@@ -112,8 +62,8 @@
 
         var from_id = get_pos_id(from.row, from.col);
         var to_id = get_pos_id(to.row, to.col);
-        document.getElementById(from_id).style.border = "5px solid green";
-        document.getElementById(to_id).style.border = "5px solid green";
+        document.getElementById(from_id).style.border = "4px solid green";
+        document.getElementById(to_id).style.border = "4px solid green";
 
       }
 
@@ -126,19 +76,23 @@
           for (var j=0; j<size; j++) {
             var piece = document.createElement("td");
             var server_piece = server_board[i][j];
-            var piece_value = "";
+
             var id = i + "," + j;
-            if(server_piece != null) {
-                var is_black = server_piece.is_player1;
-                if(is_black)
-                  piece_value = chessMapping["black"][server_piece.type];
-                else
-                  piece_value = chessMapping["white"][server_piece.type];
+
+            if(server_piece != null){
+              var is_black = server_piece.is_player1;
+              var icon = document.createElement("i");
+              icon.classList.add("fa");
+              icon.classList.add(chessMapping[server_piece.type]);
+              piece.appendChild(icon);
+              icon.style.color = (is_black == true)? "black" : "rgb(242, 242, 242)"
+
             }
             piece.id = id;
-            piece.innerHTML = piece_value
             piece.onclick = on_click;
             row.appendChild(piece);
+
+
           }
 
         }
@@ -152,13 +106,13 @@
           clicked_cnt++;
           clicked_pos = pos;
 
-          this.style.border = "5px solid orange";
+          this.style.border = "4px solid orange";
           var r = parseInt(pos[0]);
           var c = parseInt(pos[1]);
           var avail_moves = room.chess.board[r][c].available_moves;
           for (var i = 0; i < avail_moves.length; i++) {
             var id = avail_moves[i].row + "," + avail_moves[i].col;
-            document.getElementById(id).style.border = "5px solid yellow";
+            document.getElementById(id).style.border = "4px solid yellow";
           }
         }
         else{
@@ -172,8 +126,17 @@
 
         }
       }
+      function update_turn(){
+        var is_p1_turn = room.chess.p1_turn;
+        if(is_p1_turn == is_p1){
+          $("#turn").html("Your turn");
+        }
+        else{
+          $("#turn").html("The other player turn");
+        }
+      }
       function update_status(text){
-        $("#msg" ).html(text);
+        $("#message").html(text);
       }
       function update_game_status(){
         var game_status = room.chess.game_status
@@ -181,44 +144,43 @@
         if(game_status == room.chess.P1_WIN || game_status == room.chess.P2_WIN){
           p1_win = (game_status == room.chess.P1_WIN)? true: false;
           if(is_p1 && p1_win){
-            $("#game_status").html("You win!!");
+            update_status("You win!!");
           }
           else{
-            $("#game_status").html("Checkmate! You lose :(");
+            update_status("Checkmate! You lose :(");
           }
           return;
         }
 
         if(room.chess.is_check == true){
           if(is_p1 == room.chess.p1_turn)
-            $("#game_status").html("You are in check");
+            update_status("You are in check");
           else
-            $("#game_status").html("Your opponent are in check!");
+            update_status("Your opponent are in check!");
         }
         else{
-          $("#game_status").html("");
+          update_status(msg);
         }
       }
       function update_room_status(){
         $("#room").html("Room Number: " + room.room_number);
+        update_turn();
         update_game_status();
-        if(msg != null){
-          update_status(msg);
-
-        }
 
       }
-      $('form').submit(function(e){
-        e.preventDefault(); //prevent page reloading
-        var room = $('#m').val();
-        console.log('user enter: ' +room);
-        if(room == 'CREATE')
-          socket.emit('create');
-        else
-          socket.emit('join', room);
-        $('#m').val('');
-        return false;
+      $("#quit").on("click", function(){
+        console.log('Quit game');
+        socket.emit('quit', room);
       });
+      socket.on('quit', function(response){
+        if(response.success){
+          window.location.replace('/');
+        }
+        else{
+          update_status(response.data.msg)
+        }
+
+      })
       socket.on('msg', function(response){
         update_status(response.error);
       })
@@ -241,17 +203,19 @@
 
   </script>
   <body>
-    <div class="status" id="room">
+    <div class="container-fluid text-center h2 m-3" id="room">
 
     </div>
-    <div class= "status" id="msg">
+    <div class= "container-fluid text-center h2 m-3" id="turn">
     </div>
-    <div class= "status" id="game_status">
+    <div class= "container-fluid text-center h2 m-3" id="message">
     </div>
 
-    <div class='ui-responsive' id="chessBoard">
-
+    <table class='mx-auto text-center m-3' id="chessBoard">
+    </table>
+    <div class="container-fluid text-center">
+      <button class='btn btn-lg btn btn-danger m-3 ' id="quit">Quit Game</button>
     </div>
-    <!-- <div style="text-align:center;"><button id="forfeit">Forfeit</button></div> -->
+
   </body>
 </html>

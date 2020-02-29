@@ -48,11 +48,12 @@ class Chess{
         return;
       valid_move_cnt += piece.available_moves.length;
     });
-
+    
     if(ChessRules.is_check(this.board, this.p1_turn)){
       //it is a checkmate, no legal move to avoid the check
       if(valid_move_cnt == 0){
         this.game_status = (this.p1_turn == true)? this.P2_WIN: this.P1_WIN;
+        this.is_check = false;
       }
       else{
         this.is_check = true;
@@ -61,6 +62,9 @@ class Chess{
     else{
       if(valid_move_cnt == 0){
         this.game_status = this.DRAW;
+      }
+      else{
+        this.game_status = this.ONGOING;
       }
       this.is_check = false;
 
@@ -203,20 +207,21 @@ class Chess{
     }
     return true;
   }
-  toString(){
-    var board_string = [];
-    for(var r = 0; r < this.board.length; r++){
-      var row_string = [];
-      for(var c = 0; c < this.board.length; c++){
-        var cell_string = "     ";
-        if(this.board[r][c] != null)
-          cell_string = this.board[r][c].toString();
-        row_string.push(cell_string);
-      }
-      board_string.push(row_string.join("|"));
-    }
-    return board_string.join("\n");
-  }
+  // toString(){
+  //   var board_string = [];
+  //   for(var r = 0; r < this.board.length; r++){
+  //     var row_string = [];
+  //     for(var c = 0; c < this.board.length; c++){
+  //       var cell_string = "     ";
+  //       if(this.board[r][c] != null)
+  //         cell_string = this.board[r][c].toString();
+  //       row_string.push(cell_string);
+  //     }
+  //     board_string.push(row_string.join("|"));
+  //   }
+  //   return board_string.join("\n");
+  // }
+  //
   clone(){
     var pieces = [];
     this.current_pieces.forEach((piece)=>{
@@ -224,6 +229,7 @@ class Chess{
     });
     return new Chess(this.size, pieces, new Set(this.removed_pieces_p1), new Set(this.removed_pieces_p2), this.p1_turn );
   }
+
 }
 
 class Piece{
@@ -245,6 +251,8 @@ class Piece{
   clone(){
     return new Piece(this.type, this.pos.row, this.pos.col, this.is_player1, this.move_cnt, this.available_moves);
   }
+
+
 }
 class Pos{
   constructor(row, col){
@@ -429,5 +437,7 @@ class ChessRules{
 }
 module.exports = {
   Chess,
-  Piece
+  Piece,
+  Pos,
+  ChessRules
 };

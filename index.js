@@ -21,7 +21,6 @@ app.get('/', function(req, res){
     if(!request_handler.authenticate_user(user_id).success){
       req.session.user_id = request_handler.create_new_user();
       res.sendFile(__dirname + '/home.html');
-
     }
     else
       res.redirect("game_page");
@@ -33,10 +32,13 @@ app.get('/', function(req, res){
 app.get("/game_page", function(req, res){
   session(req, res, () => {
     var user_id = req.session.user_id;
-    if(!request_handler.authenticate_user(user_id).success)
+    if(!request_handler.authenticate_user(user_id).success){
       res.redirect("/");
-    else
+    }
+    else{
       res.sendFile(__dirname + '/index.html');
+    }
+
   })
 
 })
@@ -106,11 +108,13 @@ io.on('connection', function(socket){
     }
     socket.join(room);
 
+    var is_player1 = request_handler.is_player1(user_id);
 
-    var response = get_response(true, null, {room: room, msg: join_room_result.msg, details: room});
+    var response_for_sender = get_response(true, null, {room: room, msg: join_room_result.msg, is_p1: is_player1, details: room});
+    var response_for_opponent = get_response(true, null, {room: room, msg: join_room_result.msg, is_p1: !is_player1, details: room});
+    io.to(socket.id).emit('render', response_for_sender);
+    socket.to(room).emit('render', response_for_opponent);
 
-    socket.to(room).emit('render', response);
-    io.to(socket.id).emit('render', response);
 
   })
   socket.on('move', function(move_string){
@@ -134,20 +138,15 @@ io.on('connection', function(socket){
     socket.to(room).emit('render', response_for_opponent);
 
   });
+  socket.on('quit', function(){
+    var user_id = req.session.user_id;
+    var result = request_handler.quit_room(user_id);
+
+    io.to(socket.id).emit('quit', get_response(result.success, null, {msg: result.msg}));
+  });
+
   socket.on('disconnect', function(){
-    // var user_id = req.session.user_id;
-    // if(USER_TO_ROOM.hasOwnProperty(user_id)){
-    //   var room = USER_TO_ROOM[user_id];
-    //
-    //   //remove user from room state
-    //   if(room != null && ROOMS_STATE[room].p1 == user_id)
-    //     ROOMS_STATE[room].p1 = null;
-    //   else if(room != null && ROOMS_STATE[room].p2 == user_id)
-    //     ROOMS_STATE[room].p2 = null;
-    //
-    //   //delete the mapping
-    //   delete USER_TO_ROOM[user_id];
-    // }
+
 
     console.log('user disconnected');
   })

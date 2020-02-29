@@ -24,7 +24,7 @@ class RoomManager{
     var auth_result = this.authenticate_user(user_id);
     if(!auth_result.success)
       return auth_result;
-      
+
     if(this.USER_TO_ROOM[user_id] != null && this.USER_TO_ROOM[user_id] != room_id){
       return{
         success: false,
@@ -95,6 +95,34 @@ class RoomManager{
     var user_id = this.get_new_user_id();
     this.USER_TO_ROOM[user_id] = null;
     return user_id;
+  }
+  quit_room(user_id){
+    var auth_result = this.authenticate_user(user_id);
+    if(!auth_result.success)
+      return auth_result;
+    if(user_id in this.USER_TO_ROOM){
+      var room = this.get_user_room(user_id);
+      //remove user from room state
+      if(room == null)
+        return {
+          success: false,
+          msg: "You did not enter a room!"
+        }
+
+      if(room.p1 == user_id)
+        room.p1 = null;
+      else
+        room.p2 = null;
+
+      //delete the mapping
+      room.pause = true;
+      delete this.USER_TO_ROOM[user_id];
+    }
+    return {
+      success: true,
+      msg: "Success to quit room!"
+    }
+
   }
   is_user_exist(user_id){
     if(user_id == null)

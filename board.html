@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Chess Board</title>
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header div -->
+  <div class="row">
+    <div class="navbar-header">
+      <h1> Chess Board </h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-8 col-sm-4 col-md-5 col-lg-3 chess-grid">
+      <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1" align="center"><img id="rqn" src="scacchi/ntor.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="kqn" src="scacchi/ncav.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="bqn" src="scacchi/nalf.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="qn" src="scacchi/nreg.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="kn" src="scacchi/nree.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="bkn" src="scacchi/nalf.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="kkn" src="scacchi/ncav.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="rkn" src="scacchi/ntor.gif"></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="p1n" src="scacchi/nped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="p2n" src="scacchi/nped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="p3n" src="scacchi/nped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="p4n" src="scacchi/nped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="p5n" src="scacchi/nped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="p6n" src="scacchi/nped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="p7n" src="scacchi/nped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="p8n" src="scacchi/nped.gif"></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="p1b" src="scacchi/bped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="p2b" src="scacchi/bped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="p3b" src="scacchi/bped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="p4b" src="scacchi/bped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="p5b" src="scacchi/bped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="p6b" src="scacchi/bped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="p7b" src="scacchi/bped.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="p8b" src="scacchi/bped.gif"></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="rqb" src="scacchi/btor.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="kqb" src="scacchi/bcav.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="qqb" src="scacchi/balf.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="qb" src="scacchi/breg.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="kb" src="scacchi/bree.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="bkb" src="scacchi/balf.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 bg-chess-piece"><img id="kkb" src="scacchi/bcav.gif"></div>
+        <div class="col-xs-1 col-sm-1 col-md-1 "><img id="rkb" src="scacchi/btor.gif"></div>
+      </div>
+    </div>
+
+    <div class="col-xs-8 col-sm-4 col-md-3 col-lg-5 chess-stat">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th>Next Move</th>
+            <th># of Games</th>
+            <th>Last Played</th>
+            <th>Winnings percentage White/Draw/Black</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr>
+            <td><a href="#">1.a4</a></td>
+            <td>1614848</td>
+            <td>2014</td>
+            <td>38.4% 29.5% 32.1%</td>
+          </tr>
+          <tr>
+            <td><a href="#">1.d4</a></td>
+            <td>1035934</td>
+            <td>2014</td>
+            <td>38.4% 29.5% 32.1%</td>
+          </tr>
+          <tr>
+            <td><a href="#">1.Nf3</a></td>
+            <td>264425</td>
+            <td>2014</td>
+            <td>38.4% 29.5% 32.1%</td>
+          </tr>
+          <tr>
+            <td><a href="#">1.c4</a></td>
+            <td>221509</td>
+            <td>2014</td>
+            <td>38.4% 29.5% 32.1%</td>
+          </tr>
+          <tr>
+            <td><a href="#">1.q3</a></td>
+            <td>23254</td>
+            <td>2014</td>
+            <td>38.4% 29.5% 32.1%</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-8 col-sm-8 col-md-4 col-lg-4">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th>As White</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr>
+            <td>Ingbert Johannsen</td>
+            <td><a href="#">5 games</a></td>
+          </tr>
+          <tr>
+            <td>Carla Suarez Vega</td>
+            <td><a href="#">2 games</a></td>
+          </tr>
+          <tr>
+            <td>Mario Menendez Miranda</td>
+            <td><a href="#">2 games</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-xs-8 col-sm-8 col-md-4 col-lg-4">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th>As Black</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr>
+            <td>Jeanine De Cloet</td>
+            <td><a href="#">3 games</a></td>
+          </tr>
+          <tr>
+            <td>Susanne Esser</td>
+            <td><a href="#">2 games</a></td>
+          </tr>
+          <tr>
+            <td>Nguyen Anh Dang</td>
+            <td><a href="#">2 games</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

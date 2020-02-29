@@ -8,6 +8,9 @@ class RequestHandler{
 
 
   }
+  quit_room(user_id){ //public
+    return this.ROOM_MANAGER.quit_room(user_id);
+  }
   authenticate_user(user_id){ //public
     return this.ROOM_MANAGER.authenticate_user(user_id);
   }
@@ -32,7 +35,7 @@ class RequestHandler{
         success: false,
         msg: "You did not enter a room!"
       };
-      
+
     return this.GAME_MANAGER.make_move(move_string, user_id, room);
   }
   is_player1(user_id){ //public

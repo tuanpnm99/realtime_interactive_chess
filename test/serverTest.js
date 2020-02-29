@@ -1,5 +1,5 @@
 const assert = require('chai').assert;
-const {Chess} = require('../chess.js');
+const {Chess, Piece, Pos, ChessRules} = require('../chess.js');
 const RequestHandler = require('../requestHandler.js');
 
 
@@ -199,10 +199,101 @@ describe('Individual Components Unit Test', function(){
     it('The default board should have 32 chess pieces', function(){
       assert.equal(chess.current_pieces.size, 32);
     });
+    it('Test the default first turn', function(){
+      assert.equal(chess.p1_turn, true);
+    });
+    it('Test the default move history', function(){
+      assert.deepEqual(chess.prev_moves, []);
+    });
+    it('Test the default game status', function(){
+      assert.equal(chess.game_status, chess.ONGOING);
+      assert.equal(chess.is_check, false);
+
+    });
+
+    //test on 3x3 board
+    var customized_chess = new Chess(3, [new Piece("pawn", 0, 0, true), new Piece("queen", 0, 2, true), new Piece("king", 2,1, false) ]);
+    var board = [[new Piece("pawn", 0, 0, true), null, new Piece("queen", 0, 2, true)], [null, null, null], [null, new Piece("king", 2,1, false), null]];
+    it('Test position of input pieces in the board', function(){
+      for(var r = 0; r < 3; r++){
+        for(var c = 0; c < 3; c++){
+          if(board[r][c] == null)
+            assert.notExists(customized_chess.board[r][c]);
+          else{
+            assert.equal(board[r][c].type, customized_chess.board[r][c].type);
+          }
+        }
+      }
+    });
+
+    it('Test out of boundary move', function(){
+      var move_result = customized_chess.move(3, 3, 4,4);
+      assert.deepEqual(move_result,[ false, "Invalid or empty position"]);
+    });
+
+    it('Test invalid move', function(){
+      var move_result = customized_chess.move(0, 0, 2,2);
+      assert.deepEqual(move_result,[ false, "Invalid move"]);
+    });
+
+    it('Test empty postion move', function(){
+      var move_result = customized_chess.move(1,1, 2,2);
+      assert.deepEqual(move_result,[ false, "Invalid or empty position"]);
+    });
+
+    it('Test move in the wrong turn', function(){
+      var move_result = customized_chess.move(2,1, 1,1);
+      assert.deepEqual(move_result,[ false,"Invalid move! This is not your chess piece"]);
+    });
+    it('Test reverse to last move', function(){
+      var clone = customized_chess.clone();
+
+      //make move reverse to the last state
+      customized_chess.move(0,2, 1,1);
+      customized_chess.reverse_last_move();
+      customized_chess.sync_avail_moves();
+      customized_chess.sync_game_status();
+
+      assert.deepEqual(customized_chess, clone);
+    });
+
+    it('Test valid move', function(){
+      var move_result = customized_chess.move(0,0, 1,0);
+      assert.deepEqual(move_result,[ true , "Success move!"]);
+    });
+
+    it('Test if the turn is switched after a move', function(){
+      assert.equal(customized_chess.p1_turn, false);
+    });
+
+    it('Test game status when in check', function(){
+      assert.equal(customized_chess.game_status, customized_chess.ONGOING);
+      assert.equal(customized_chess.is_check, true);
+    });
+
+
+    it('Test checkmate', function(){
+      var checkmate_board = new Chess(3, [new Piece("pawn", 0, 0, true), new Piece("queen", 0, 2, true), new Piece("king", 2,1, false) ], false);
+      checkmate_board.move(2,1,1,0);
+      checkmate_board.move(0,2,1,1);
+
+      assert.equal(checkmate_board.game_status, checkmate_board.P1_WIN);
+    });
+    it('Test stalemate (draw game)', function(){
+      var stalemate_board = new Chess(3, [new Piece("king", 2, 0, true), new Piece("queen", 1,2, false) ]);
+      assert.equal(stalemate_board.game_status, stalemate_board.DRAW);
+    });
 
   });
 
 });
+
+
+
+
+
+
+
 
 describe('Integration Test using Request Handler', function(){
   var request_handler = new RequestHandler();
