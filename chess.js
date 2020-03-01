@@ -31,14 +31,14 @@ class Chess{
   }
 
   static start_board_pieces(){
-    return [new Piece("rock", 0, 0, true), new Piece("knight", 0, 1, true), new Piece("bishop", 0, 2, true), new Piece("queen", 0, 3, true)
-           ,new Piece("king", 0, 4, true), new Piece("bishop", 0, 5, true), new Piece("knight", 0, 6, true), new Piece("rock", 0, 7, true)
-           ,new Piece("pawn", 1, 0, true), new Piece("pawn", 1, 1, true), new Piece("pawn", 1, 2, true), new Piece("pawn", 1, 3, true)
-           ,new Piece("pawn", 1, 4, true), new Piece("pawn", 1, 5, true), new Piece("pawn", 1, 6, true), new Piece("pawn", 1, 7, true)
-           ,new Piece("rock", 7, 7, false), new Piece("knight", 7, 6, false), new Piece("bishop", 7, 5, false), new Piece("queen", 7, 3, false)
-           ,new Piece("king", 7, 4, false), new Piece("bishop", 7, 2, false), new Piece("knight", 7, 1, false), new Piece("rock", 7, 0, false)
-           ,new Piece("pawn", 6, 0, false), new Piece("pawn", 6, 1, false), new Piece("pawn", 6, 2, false), new Piece("pawn", 6, 3, false)
-           ,new Piece("pawn", 6, 4, false), new Piece("pawn", 6, 5, false), new Piece("pawn", 6, 6, false), new Piece("pawn", 6, 7, false)
+    return [new Piece("rock", 0, 0, false), new Piece("knight", 0, 1, false), new Piece("bishop", 0, 2, false), new Piece("queen", 0, 3, false)
+           ,new Piece("king", 0, 4, false), new Piece("bishop", 0, 5, false), new Piece("knight", 0, 6, false), new Piece("rock", 0, 7, false)
+           ,new Piece("pawn", 1, 0, false), new Piece("pawn", 1, 1, false), new Piece("pawn", 1, 2, false), new Piece("pawn", 1, 3, false)
+           ,new Piece("pawn", 1, 4, false), new Piece("pawn", 1, 5, false), new Piece("pawn", 1, 6, false), new Piece("pawn", 1, 7, false)
+           ,new Piece("rock", 7, 7, true), new Piece("knight", 7, 6, true), new Piece("bishop", 7, 5, true), new Piece("queen", 7, 3, true)
+           ,new Piece("king", 7, 4, true), new Piece("bishop", 7, 2, true), new Piece("knight", 7, 1, true), new Piece("rock", 7, 0, true)
+           ,new Piece("pawn", 6, 0, true), new Piece("pawn", 6, 1, true), new Piece("pawn", 6, 2, true), new Piece("pawn", 6, 3, true)
+           ,new Piece("pawn", 6, 4, true), new Piece("pawn", 6, 5, true), new Piece("pawn", 6, 6, true), new Piece("pawn", 6, 7, true)
          ];
   }
   sync_game_status(){
@@ -48,7 +48,7 @@ class Chess{
         return;
       valid_move_cnt += piece.available_moves.length;
     });
-    
+
     if(ChessRules.is_check(this.board, this.p1_turn)){
       //it is a checkmate, no legal move to avoid the check
       if(valid_move_cnt == 0){
@@ -69,6 +69,15 @@ class Chess{
       this.is_check = false;
 
     }
+  }
+  is_game_end(){
+    if(this.game_status == this.DRAW)
+      return [true, "Draw Game!"];
+    if(this.game_status == this.P1_WIN)
+      return [true, "P1 Win!"];
+    if(this.game_status == this.P2_WIN)
+      return [true, "P2 Win!"];
+    return [false, "Ongoing game!"];
   }
   sync_avail_moves(){
     //copy is needed because we might mutate the current_pieces
@@ -113,7 +122,10 @@ class Chess{
     return [true, "Success!"];
   }
   move(row, col, next_row, next_col){
-
+    var check_status_result = this.is_game_end();
+    if(check_status_result[0]){
+      return [false, check_status_result[1]];
+    }
     if(!ChessRules.is_valid_pos(row, col, this.board) || this.board[row][col] == null)
       return [false, "Invalid or empty position"];
     var piece = this.board[row][col];
@@ -328,7 +340,7 @@ class ChessRules{
   }
   static pawn_moves(piece, board){
     var moves = [];
-    var direction = (piece.is_player1 == true)? 1: -1;
+    var direction = (piece.is_player1 == true)? -1: 1;
     var row = piece.pos.row;
     var col = piece.pos.col;
 

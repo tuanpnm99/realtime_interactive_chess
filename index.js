@@ -1,8 +1,9 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').createServer(app);
 
 var io = require('socket.io')(http);
-
+app.use(express.static('.'));
 const session = require('cookie-session')({
     name: 'interactive-chess-game',
     secret: 'dasdas0i-23mkjda0-123'
@@ -36,7 +37,7 @@ app.get("/game_page", function(req, res){
       res.redirect("/");
     }
     else{
-      res.sendFile(__dirname + '/index.html');
+      res.sendFile(__dirname + '/game_page.html');
     }
 
   })

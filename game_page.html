@@ -80,7 +80,7 @@
             var id = i + "," + j;
 
             if(server_piece != null){
-              var is_black = server_piece.is_player1;
+              var is_black = !server_piece.is_player1;
               var icon = document.createElement("i");
               icon.classList.add("fa");
               icon.classList.add(chessMapping[server_piece.type]);
@@ -140,7 +140,11 @@
       }
       function update_game_status(){
         var game_status = room.chess.game_status
-
+        console.log(game_status)
+        if(game_status == room.chess.DRAW){
+          update_status("Draw Game!");
+          return;
+        }
         if(game_status == room.chess.P1_WIN || game_status == room.chess.P2_WIN){
           p1_win = (game_status == room.chess.P1_WIN)? true: false;
           if(is_p1 && p1_win){
