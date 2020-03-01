@@ -284,6 +284,315 @@ describe('Individual Components Unit Test', function(){
       assert.equal(stalemate_board.game_status, stalemate_board.DRAW);
     });
 
+    it('Pawn Moves 2 steps forward at the first time', function() {
+      var pawn = new Piece("pawn", 1, 0, true);
+      var move = ChessRules.available_moves(pawn, chess.board);
+      pawn.available_moves = move;
+      assert.equal(chess.is_valid_chess_move(3, 0, pawn), true);
+    });
+
+    it("The pawn moves two steps forward after the first time doing that, or tires to move to the positions which are not valid", function() {
+      var pawn = new Piece("pawn", 1, 0, true);
+      var move = ChessRules.available_moves(pawn, chess.board);
+      pawn.available_moves = move;
+      assert.equal(chess.is_valid_chess_move(3, 0, pawn), true);
+      pawn.available_moves = ChessRules.available_moves(pawn, chess.board);
+      assert.equal(chess.is_valid_chess_move(5, 0, pawn), false);
+      assert.equal(chess.is_valid_chess_move(4, 1, pawn), false);
+    });
+
+    it("The pawn cannot make a move forward if there's no piece blocking the way", function() {
+      var pawn = new Piece("pawn", 1, 1, true);
+      var move = ChessRules.available_moves(pawn, chess.board);
+      pawn.available_moves = move;
+      assert.equal(chess.is_valid_chess_move(2, 1, pawn), true);
+    });
+
+    it("The pawn cannot a move forward if there's a piece blocking the way", function() {
+      var pawn = new Piece("pawn", 1, 2, true);
+      var rook = new Piece("rock", 2, 2, true);
+      var chess_game = new Chess(8, [pawn, rook], true);
+      var move = ChessRules.available_moves(pawn, chess_game.board);
+      pawn.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(2, 2, pawn), false);
+    });
+
+    it("The user's pawn attacks the other player's pieces", function() {
+      var pawn = new Piece("pawn", 6, 0, false);
+      var bishop = new Piece("bishop", 5, 1, true);
+      var chess_game = new Chess(8, [pawn, bishop], false);
+      var move = ChessRules.available_moves(pawn, chess_game.board);
+      pawn.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(5, 1, pawn), true);
+    });
+
+    it("The user's pawn cannot attack his own pieces", function() {
+      var pawn = new Piece("pawn", 1, 3, true);
+      var queen = new Piece("queen", 2, 4, true);
+      var chess_game = new Chess(8, [pawn, queen], true);
+      var move = ChessRules.available_moves(pawn, chess_game.board);
+      pawn.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(2, 4, pawn), false);
+    });
+
+    it("The rook moves forward, backward, left, and right at any valid steps", function() {
+      var rook = new Piece("rock", 2, 2, true);
+      var chess_game = new Chess(8, [rook], true);
+      var move = ChessRules.available_moves(rook, chess_game.board);
+
+      //left
+      assert.equal(chess_game.is_valid_chess_move(2, 1, rook), true);
+      assert.equal(chess_game.is_valid_chess_move(2, 0, rook), true);
+
+      //right
+      assert.equal(chess_game.is_valid_chess_move(2, 3, rook), true);
+      assert.equal(chess_game.is_valid_chess_move(2, 4, rook), true);
+
+      //up
+      assert.equal(chess_game.is_valid_chess_move(3, 2, rook), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 2, rook), true);
+
+      //down
+      assert.equal(chess_game.is_valid_chess_move(1, 2, rook), true);
+      assert.equal(chess_game.is_valid_chess_move(0, 2, rook), true);
+    });
+
+    it("The user's rook attacks the other player's pieces", function() {
+      var rook = new Piece("rock", 2, 2, true);
+      var queen = new Piece("queen", 2, 6, false);
+      var chess_game = new Chess(8, [rook, queen], true);
+      var move = ChessRules.available_moves(rook, chess_game.board);
+      assert.equal(chess_game.is_valid_chess_move(2, 6, rook), true);
+    });
+
+    it("The user's rook cannot attack his own pieces", function() {
+      var rook = new Piece("rock", 2, 2, true);
+      var king = new Piece("queen", 2, 0, true);
+      var chess_game = new Chess(8, [rook, king], true);
+      var move = ChessRules.available_moves(rook, chess_game.board);
+      assert.equal(chess_game.is_valid_chess_move(2, 0, rook), false);
+    });
+
+    it("The bishop moves diagonally at any valid steps", function() {
+      var bishop = new Piece("bishop", 3, 2, true);
+      var chess_game = new Chess(8, [bishop], true);
+      var move = ChessRules.available_moves(bishop, chess_game.board);
+
+      //left down
+      assert.equal(chess_game.is_valid_chess_move(2, 1, bishop), true);
+      assert.equal(chess_game.is_valid_chess_move(1, 0, bishop), true);
+
+      //left up
+      assert.equal(chess_game.is_valid_chess_move(4, 1, bishop), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 0, bishop), true);
+
+      //right down
+      assert.equal(chess_game.is_valid_chess_move(2, 3, bishop), true);
+      assert.equal(chess_game.is_valid_chess_move(1, 4, bishop), true);
+
+      //right up
+      assert.equal(chess_game.is_valid_chess_move(4, 3, bishop), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 4, bishop), true);
+      assert.equal(chess_game.is_valid_chess_move(6, 5, bishop), true);
+    });
+
+    it("The user's bishop attacks the other player's pieces", function() {
+      var bishop = new Piece("bishop", 3, 3, true);
+      var knight = new Piece("knight", 4, 4, false);
+      var chess_game = new Chess(8, [bishop, knight], true);
+      var move = ChessRules.available_moves(bishop, chess_game.board);
+      bishop.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(4, 4, bishop), true);
+    });
+
+    it("The user's bishop cannot attack his own pieces", function() {
+      var bishop = new Piece("bishop", 3, 3, true);
+      var knight = new Piece("knight", 2, 2, true);
+      var chess_game = new Chess(8, [bishop, knight], true);
+      var move = ChessRules.available_moves(bishop, chess_game.board);
+      bishop.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(2, 2, bishop), false);
+    });
+
+    it("The knight moves two squares vertically and one square horizontally, or two squares horizontally and one square vertically", function() {
+      var knight = new Piece("knight", 2, 2, true);
+      var chess_game = new Chess(8, [knight], true);
+      var move = ChessRules.available_moves(knight, chess_game.board);
+      knight.available_moves = move;
+
+      //moves two squares vertically and one square horizontally
+      assert.equal(chess_game.is_valid_chess_move(0, 1, knight), true);
+      assert.equal(chess_game.is_valid_chess_move(4, 3, knight), true);
+
+
+      //moves two squares horizontally and one square vertically
+      assert.equal(chess_game.is_valid_chess_move(1, 4, knight), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 4, knight), true);
+    });
+
+    it("The user’s knight attacks the other player’s pieces", function() {
+      var knight = new Piece("knight", 2, 2, true);
+      var pawn = new Piece("pawn", 4, 1, false);
+      var chess_game = new Chess(8, [knight, pawn], true);
+      var move = ChessRules.available_moves(knight, chess_game.board);
+      knight.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(4, 1, knight), true);
+    });
+
+    it("The user’s knight attacks his own pieces", function() {
+      var knight = new Piece("knight", 0, 6, true);
+      var pawn = new Piece("pawn", 1, 4, true);
+      var chess_game = new Chess(8, [knight, pawn], true);
+      var move = ChessRules.available_moves(knight, chess_game.board);
+      knight.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(4, 1, knight), false);
+    });
+
+    it("The queen should moves forward, backward, left, right, and diagonally at any valid steps", function() {
+      var queen = new Piece("queen", 3, 3, true);
+      var chess_game = new Chess(8, [queen], true);
+      var move = ChessRules.available_moves(queen, chess_game.board);
+      queen.available_moves = move;
+
+      //left
+      assert.equal(chess_game.is_valid_chess_move(3, 2, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 1, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 0, queen), true);
+
+
+      //right
+      assert.equal(chess_game.is_valid_chess_move(3, 4, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 5, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 6, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 7, queen), true);
+
+
+      //up
+      assert.equal(chess_game.is_valid_chess_move(4, 3, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 3, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(6, 3, queen), true);
+
+
+      //down
+      assert.equal(chess_game.is_valid_chess_move(2, 3, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(1, 3, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(0, 3, queen), true);
+
+      //left down
+      assert.equal(chess_game.is_valid_chess_move(2, 2, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(1, 1, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(0, 0, queen), true);
+
+
+      //left up
+      assert.equal(chess_game.is_valid_chess_move(4, 2, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 1, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(6, 0, queen), true);
+
+
+      //right down
+      assert.equal(chess_game.is_valid_chess_move(2, 4, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(1, 5, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(0, 6, queen), true);
+
+
+      //right up
+      assert.equal(chess_game.is_valid_chess_move(4, 4, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 5, queen), true);
+      assert.equal(chess_game.is_valid_chess_move(6, 6, queen), true);
+    });
+
+    it("The user’s queen attacks the other player’s pieces", function() {
+      var queen = new Piece("queen", 3, 4, true);
+      var queen_2 = new Piece("queen", 4, 3, false);
+      var chess_game = new Chess(8, [queen, queen_2], true);
+      var move = ChessRules.available_moves(queen, chess_game.board);
+      queen.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(4, 3, queen), true);
+    });
+
+    it("The user’s queen cannot attack his own pieces", function() {
+      var queen = new Piece("queen", 3, 4, true);
+      var pawn = new Piece("pawn", 3, 3, true);
+      var chess_game = new Chess(8, [queen, pawn], true);
+      var move = ChessRules.available_moves(queen, chess_game.board);
+      queen.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(3, 3, queen), false);
+    });
+
+    it("The king should moves forward, backward, left, right, and diagonally at one step", function() {
+      var king = new Piece("king", 3, 3, true);
+      var chess_game = new Chess(8, [king], true);
+      var move = ChessRules.available_moves(king, chess_game.board);
+      king.available_moves = move;
+
+      //left
+      assert.equal(chess_game.is_valid_chess_move(3, 2, king), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 1, king), false);
+      assert.equal(chess_game.is_valid_chess_move(3, 0, king), false);
+
+
+      //right
+      assert.equal(chess_game.is_valid_chess_move(3, 4, king), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 5, king), false);
+      assert.equal(chess_game.is_valid_chess_move(3, 6, king), false);
+      assert.equal(chess_game.is_valid_chess_move(3, 7, king), false);
+
+
+      //up
+      assert.equal(chess_game.is_valid_chess_move(4, 3, king), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 3, king), false);
+      assert.equal(chess_game.is_valid_chess_move(6, 3, king), false);
+
+
+      //down
+      assert.equal(chess_game.is_valid_chess_move(2, 3, king), true);
+      assert.equal(chess_game.is_valid_chess_move(1, 3, king), false);
+      assert.equal(chess_game.is_valid_chess_move(0, 3, king), false);
+
+      //left down
+      assert.equal(chess_game.is_valid_chess_move(2, 2, king), true);
+      assert.equal(chess_game.is_valid_chess_move(1, 1, king), false);
+      assert.equal(chess_game.is_valid_chess_move(0, 0, king), false);
+
+
+      //left up
+      assert.equal(chess_game.is_valid_chess_move(4, 2, king), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 1, king), false);
+      assert.equal(chess_game.is_valid_chess_move(6, 0, king), false);
+
+
+      //right down
+      assert.equal(chess_game.is_valid_chess_move(2, 4, king), true);
+      assert.equal(chess_game.is_valid_chess_move(1, 5, king), false);
+      assert.equal(chess_game.is_valid_chess_move(0, 6, king), false);
+
+
+      //right up
+      assert.equal(chess_game.is_valid_chess_move(4, 4, king), true);
+      assert.equal(chess_game.is_valid_chess_move(5, 5, king), false);
+      assert.equal(chess_game.is_valid_chess_move(6, 6, king), false);
+    });
+
+    it("The user’s king attacks the other player’s pieces", function() {
+      var king = new Piece("king", 4, 4, true);
+      var queen = new Piece("queen", 5, 4, false);
+      var chess_game = new Chess(8, [king, queen], true);
+      var move = ChessRules.available_moves(king, chess_game.board);
+      king.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(5, 4, king), true);
+    });
+
+    it("The user’s king cannot attack his own pieces", function() {
+      var king = new Piece("king", 4, 4, true);
+      var rook = new Piece("rock", 4, 3, true);
+      var chess_game = new Chess(8, [king, rook], true);
+      var move = ChessRules.available_moves(king, chess_game.board);
+      king.available_moves = move;
+      assert.equal(chess_game.is_valid_chess_move(4, 3, king), false);
+    });
+  });
+
   });
 
 });
