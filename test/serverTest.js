@@ -286,26 +286,29 @@ describe('Individual Components Unit Test', function(){
 
     it('Pawn Moves 2 steps forward at the first time', function() {
       var pawn = new Piece("pawn", 1, 0, true);
-      var move = ChessRules.available_moves(pawn, chess.board);
+      var chess_game = new Chess(8, [pawn], true);
+      var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
-      assert.equal(chess.is_valid_chess_move(3, 0, pawn), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 0, pawn), true);
     });
 
     it("The pawn moves two steps forward after the first time doing that, or tires to move to the positions which are not valid", function() {
       var pawn = new Piece("pawn", 1, 0, true);
-      var move = ChessRules.available_moves(pawn, chess.board);
+      var chess_game = new Chess(8, [pawn], true);
+      var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
-      assert.equal(chess.is_valid_chess_move(3, 0, pawn), true);
+      assert.equal(chess_game.is_valid_chess_move(3, 0, pawn), true);
       pawn.available_moves = ChessRules.available_moves(pawn, chess.board);
-      assert.equal(chess.is_valid_chess_move(5, 0, pawn), false);
-      assert.equal(chess.is_valid_chess_move(4, 1, pawn), false);
+      assert.equal(chess_game.is_valid_chess_move(5, 0, pawn), false);
+      assert.equal(chess_game.is_valid_chess_move(4, 1, pawn), false);
     });
 
     it("The pawn cannot make a move forward if there's no piece blocking the way", function() {
       var pawn = new Piece("pawn", 1, 1, true);
-      var move = ChessRules.available_moves(pawn, chess.board);
+      var chess_game = new Chess(8, [pawn], true);
+      var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
-      assert.equal(chess.is_valid_chess_move(2, 1, pawn), true);
+      assert.equal(chess_game.is_valid_chess_move(2, 1, pawn), true);
     });
 
     it("The pawn cannot a move forward if there's a piece blocking the way", function() {
@@ -591,7 +594,7 @@ describe('Individual Components Unit Test', function(){
       king.available_moves = move;
       assert.equal(chess_game.is_valid_chess_move(4, 3, king), false);
     });
-  });
+  //});
 
   });
 
