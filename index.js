@@ -19,10 +19,12 @@ var request_handler = new RequestHandler();
 app.get('/', function(req, res){
   session(req, res, () => {
     var user_id = req.session.user_id;
-    if(!request_handler.authenticate_user(user_id).success){
+
+    if(!request_handler.authenticate_user(user_id).success)
       req.session.user_id = request_handler.create_new_user();
+
+    if(request_handler.get_user_room(user_id) == null)
       res.sendFile(__dirname + '/home.html');
-    }
     else
       res.redirect("game_page");
   })
@@ -33,7 +35,7 @@ app.get('/', function(req, res){
 app.get("/game_page", function(req, res){
   session(req, res, () => {
     var user_id = req.session.user_id;
-    if(!request_handler.authenticate_user(user_id).success){
+    if(!request_handler.authenticate_user(user_id).success || request_handler.get_user_room(user_id) == null){
       res.redirect("/");
     }
     else{
