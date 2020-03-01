@@ -20,7 +20,7 @@ class RoomManager{
       msg: "Success!"
     };
   }
-  join_room(user_id, room_id){ //public
+  join_room(user_id, room_id, username = null){ //public
     var auth_result = this.authenticate_user(user_id);
     if(!auth_result.success)
       return auth_result;
@@ -40,10 +40,16 @@ class RoomManager{
     var room = this.get_room(room_id);
 
     if(room.p1 != user_id && room.p2 != user_id){
-      if(room.p1 == null)
+      if(room.p1 == null){
         room.p1 = user_id;
-      else
+        if(username != null)
+          room.p1_username = username;
+      }
+      else{
         room.p2 = user_id;
+        if(username != null)
+          room.p2_username = username;
+      }
     }
     this.USER_TO_ROOM[user_id] = room_id;
     var msg = "Success to join!";
@@ -56,7 +62,7 @@ class RoomManager{
       msg: msg
     };
   }
-  create_room(user_id){ //public
+  create_room(user_id, username=null){ //public
     var auth_result = this.authenticate_user(user_id);
     if(!auth_result.success)
       return auth_result;
@@ -79,7 +85,9 @@ class RoomManager{
       this.ROOMS_STATE[new_id] = {
         room_number: new_id,
         p1: user_id,
+        p1_username: username,
         p2: null,
+        p2_username: null,
         chess: new_game,
         pause: true
       }
@@ -109,10 +117,14 @@ class RoomManager{
           msg: "You did not enter a room!"
         }
 
-      if(room.p1 == user_id)
+      if(room.p1 == user_id){
         room.p1 = null;
-      else
+        room.p1_username = null;
+      }
+      else{
         room.p2 = null;
+        room.p2_username = null;
+      }
 
       //delete the mapping
       room.pause = true;

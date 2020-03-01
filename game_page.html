@@ -62,8 +62,10 @@
 
         var from_id = get_pos_id(from.row, from.col);
         var to_id = get_pos_id(to.row, to.col);
-        document.getElementById(from_id).style.border = "4px solid green";
-        document.getElementById(to_id).style.border = "4px solid green";
+        var color = (is_your_turn() == true)? "red": "green";
+
+        document.getElementById(from_id).style.border = "4px solid " + color;
+        document.getElementById(to_id).style.border = "4px solid " + color;
 
       }
 
@@ -126,14 +128,38 @@
 
         }
       }
-      function update_turn(){
+      function is_your_turn(){
         var is_p1_turn = room.chess.p1_turn;
-        if(is_p1_turn == is_p1){
+        if(is_p1_turn == is_p1)
+          return true;
+        return false;
+      }
+      function update_userinfo(){
+        if(is_your_turn()){
           $("#turn").html("Your turn");
         }
         else{
           $("#turn").html("The other player turn");
         }
+
+        var p1_username = room.p1_username;
+        var p2_username = room.p2_username;
+        var p1_side = "You : ";
+        var p2_side = "Your Opponent : "
+        var p1_color = 'green';
+        var p2_color = 'red';
+        if(!is_p1){ //swap for the side and color
+          var tmp = p1_side;
+          p1_side = p2_side;
+          p2_side = tmp;
+          tmp = p1_color;
+          p1_color = p2_color;
+          p2_color = tmp
+        }
+        $("#p1_info").html(p1_side + p1_username);
+        $("#p2_info").html(p2_side + p2_username);
+        $("#p1_info").css('color',  p1_color);
+        $("#p2_info").css('color',  p2_color);
       }
       function update_status(text){
         $("#message").html(text);
@@ -166,9 +192,9 @@
           update_status(msg);
         }
       }
-      function update_room_status(){
+      function update_room_info(){
         $("#room").html("Room Number: " + room.room_number);
-        update_turn();
+        update_userinfo();
         update_game_status();
 
       }
@@ -194,7 +220,7 @@
         msg = response.data.msg;
         is_p1 = response.data.is_p1
         render_board(room.chess.board);
-        update_room_status();
+        update_room_info();
       })
       socket.on('join', function(response){
         if(response.success){
@@ -208,15 +234,21 @@
   </script>
   <body>
     <div class="container-fluid text-center h2 m-3" id="room">
-
     </div>
     <div class= "container-fluid text-center h2 m-3" id="turn">
     </div>
     <div class= "container-fluid text-center h2 m-3" id="message">
     </div>
 
+    <div class="container-fluid text-left h2 m-3" id="p2_info">
+    </div>
+
     <table class='mx-auto text-center m-3' id="chessBoard">
     </table>
+
+    <div class="container-fluid text-left h2 m-3" id="p1_info">
+    </div>
+
     <div class="container-fluid text-center">
       <button class='btn btn-lg btn btn-danger m-3 ' id="quit">Quit Game</button>
     </div>

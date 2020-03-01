@@ -120,16 +120,24 @@
 	$(function(){
 		socket = io();
 
-		$("#join").on("click", function(){
-		var room = $('#room_id').val();
-		$('#room_id').val('');
-		console.log("Join room " + room);
-		socket.emit('join_home_page', room);
-		});
-		$("#create").on("click", function(){
-		console.log("Create room");
-		socket.emit('create');
-		});
+		$("#join").submit(function(e){
+      e.preventDefault(); //prevent page reloading
+  		var room = $('#room_id').val();
+      var usr = $("#usr_name2").val();
+  		$('#room_id').val('');
+      $("#usr_name2").val('');
+  		console.log("Join room " + room + "with username" + usr);
+  		socket.emit('join_home_page', {room: room, username: usr});
+    });
+
+    $("#create").submit(function(e){
+      e.preventDefault(); //prevent page reloading
+      console.log("Create room");
+      var usr = $("#usr_name1").val();
+      $("#usr_name1").val('');
+  		socket.emit('create', {username: usr});
+    });
+
 		socket.on('join', function(response){
 		window.location.replace(response);
 		})
@@ -148,11 +156,13 @@
 			<center>
 				<h2>Create a game</h2>
 				<div>
-					<label>Username:</label>
-					<input type="text" id="usr_name1" placeholder="Username" rows="1" required></label>
-					<br><br>
-					<button class="submit_button1" id="create">Create</button>
-					<br><br>
+          <form id="create">
+            <label>Username:</label>
+  					<input type="text" id="usr_name1" placeholder="Username" rows="1" required></label>
+  					<br><br>
+  					<button class="submit_button1" id="create">Create</button>
+  					<br><br>
+          </form>
 				</div>
 
 				<br>
@@ -163,13 +173,15 @@
 			<center>
 				<h2>Join a Game</h2>
 				<div>
-					<label>Username:</label>
-					<input type="text" id="usr_name2" placeholder="Username" rows="1" required></label>
-					<label>Room ID:</label>
-					<input type="text" id="room_id" placeholder="Room id" rows="1" required></label>
-					<br><br>
-					<button class="submit_button1" id="join">Join</button>
-					<br><br>
+          <form id="join">
+            <label>Username:</label>
+            <input type="text" id="usr_name2" placeholder="Username" rows="1" required></label>
+            <label>Room ID:</label>
+            <input type="text" id="room_id" placeholder="Room id" rows="1" required></label>
+            <br><br>
+            <button class="submit_button1">Join</button>
+            <br><br>
+          </form>
 				</div>
 				<br>
 			</center>

@@ -64,10 +64,11 @@ io.on('connection', function(socket){
 
   console.log('a user connected with id: ' + socket.id);
 
-  socket.on('create', function(){
+  socket.on('create', function(input){
+    var username = input.username;
     var user_id = req.session.user_id;
-    console.log(user_id + "wants to create new room");
-    var create_room_result = request_handler.create_room(user_id);
+    console.log(user_id + "wants to create new room with username " + username);
+    var create_room_result = request_handler.create_room(user_id, username);
 
     if(!create_room_result.success){
       io.to(socket.id).emit('msg', get_response(false, create_room_result.msg, null));
@@ -81,11 +82,13 @@ io.on('connection', function(socket){
     io.to(socket.id).emit('join', "/game_page");
 
   })
-  socket.on('join_home_page', function(room_id){
+  socket.on('join_home_page', function(input){
+    var username = input.username;
+    var room_id = input.room;
     var user_id = req.session.user_id;
-    console.log( user_id + ' wants to join: ' + room_id);
+    console.log( user_id + ' wants to join: ' + room_id + ' with username ' + username);
 
-    var join_room_result = request_handler.join_room(user_id, room_id);
+    var join_room_result = request_handler.join_room(user_id, room_id, username);
     if(!join_room_result.success){
       io.to(socket.id).emit('msg', get_response(false, join_room_result.msg, null));
       return;

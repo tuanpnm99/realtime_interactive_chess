@@ -14,14 +14,14 @@ class RequestHandler{
   authenticate_user(user_id){ //public
     return this.ROOM_MANAGER.authenticate_user(user_id);
   }
-  join_room(user_id, room_id){ //public
-    return this.ROOM_MANAGER.join_room(user_id, room_id);
+  join_room(user_id, room_id, username){ //public
+    return this.ROOM_MANAGER.join_room(user_id, room_id, username);
   }
   get_user_room(user_id){ //public
     return this.ROOM_MANAGER.get_user_room(user_id);
   }
-  create_room(user_id){ //public
-    return this.ROOM_MANAGER.create_room(user_id);
+  create_room(user_id, username){ //public
+    return this.ROOM_MANAGER.create_room(user_id, username);
   }
   make_move(move_string, user_id){ //public
     var auth_result = this.ROOM_MANAGER.authenticate_user(user_id);
