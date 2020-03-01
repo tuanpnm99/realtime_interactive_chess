@@ -285,16 +285,16 @@ describe('Individual Components Unit Test', function(){
     });
 
     it('Pawn Moves 2 steps forward at the first time', function() {
-      var pawn = new Piece("pawn", 1, 0, true);
-      var chess_game = new Chess(8, [pawn], true);
+      var pawn = new Piece("pawn", 1, 0, false);
+      var chess_game = new Chess(8, [pawn], false);
       var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
       assert.equal(chess_game.is_valid_chess_move(3, 0, pawn), true);
     });
 
     it("The pawn moves two steps forward after the first time doing that, or tires to move to the positions which are not valid", function() {
-      var pawn = new Piece("pawn", 1, 0, true);
-      var chess_game = new Chess(8, [pawn], true);
+      var pawn = new Piece("pawn", 1, 0, false);
+      var chess_game = new Chess(8, [pawn], false);
       var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
       assert.equal(chess_game.is_valid_chess_move(3, 0, pawn), true);
@@ -304,34 +304,34 @@ describe('Individual Components Unit Test', function(){
     });
 
     it("The pawn cannot make a move forward if there's no piece blocking the way", function() {
-      var pawn = new Piece("pawn", 1, 1, true);
-      var chess_game = new Chess(8, [pawn], true);
+      var pawn = new Piece("pawn", 1, 1, false);
+      var chess_game = new Chess(8, [pawn], false);
       var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
       assert.equal(chess_game.is_valid_chess_move(2, 1, pawn), true);
     });
 
     it("The pawn cannot a move forward if there's a piece blocking the way", function() {
-      var pawn = new Piece("pawn", 1, 2, true);
-      var rook = new Piece("rock", 2, 2, true);
-      var chess_game = new Chess(8, [pawn, rook], true);
+      var pawn = new Piece("pawn", 1, 2, false);
+      var rook = new Piece("rock", 2, 2, false);
+      var chess_game = new Chess(8, [pawn, rook], false);
       var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
       assert.equal(chess_game.is_valid_chess_move(2, 2, pawn), false);
     });
 
     it("The user's pawn attacks the other player's pieces", function() {
-      var pawn = new Piece("pawn", 6, 0, false);
-      var bishop = new Piece("bishop", 5, 1, true);
-      var chess_game = new Chess(8, [pawn, bishop], false);
+      var pawn = new Piece("pawn", 6, 0, true);
+      var bishop = new Piece("bishop", 5, 1, false);
+      var chess_game = new Chess(8, [pawn, bishop], true);
       var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
       assert.equal(chess_game.is_valid_chess_move(5, 1, pawn), true);
     });
 
     it("The user's pawn cannot attack his own pieces", function() {
-      var pawn = new Piece("pawn", 1, 3, true);
-      var queen = new Piece("queen", 2, 4, true);
+      var pawn = new Piece("pawn", 1, 3, false);
+      var queen = new Piece("queen", 2, 4, false);
       var chess_game = new Chess(8, [pawn, queen], true);
       var move = ChessRules.available_moves(pawn, chess_game.board);
       pawn.available_moves = move;
