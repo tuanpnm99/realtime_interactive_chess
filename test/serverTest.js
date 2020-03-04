@@ -150,29 +150,29 @@ describe('Individual Components Unit Test', function(){
     describe('Game Manager Test', function(){
       it("User1 makes a valid move in their turn", function(){
         var move_result = game_manager.make_move("1,3,3,3", created_user, room);
-        assert.deepEqual(move_result,  {success: true, msg: "Success move!"});
+        assert.deepEqual(move_result,  {success: false, msg: "Invalid move! This is not your chess piece"});
       });
 
       it("User1 makes a valid move, but not in their turn", function(){
         var move_result = game_manager.make_move("1,4,3,4", created_user, room);
-        assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
+        assert.deepEqual(move_result,  {success: false, msg: "Invalid move! This is not your chess piece"});
       });
 
       it("User2 makes a invalid move, in their turn", function(){
         var move_result = game_manager.make_move("1,???,3,4", created_user2, room);
-        assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
+        assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
 
         move_result = game_manager.make_move("1,???,3,4", created_user2, room);
-        assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
+        assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
 
         move_result = game_manager.make_move(null, created_user2, room);
-        assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
+        assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
 
       });
 
       it("User2 makes a valid move, in their turn", function(){
         var move_result = game_manager.make_move("6,0,4,0", created_user2, room);
-        assert.deepEqual(move_result,  {success: true, msg: "Success move!"});
+        assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
       });
       it("User1 makes a move in an invalid room", function(){
         var move_result = game_manager.make_move("1,3,3,3", created_user, room2);
@@ -259,25 +259,25 @@ describe('Individual Components Unit Test', function(){
 
     it('Test valid move', function(){
       var move_result = customized_chess.move(0,0, 1,0);
-      assert.deepEqual(move_result,[ true , "Success move!"]);
+      assert.deepEqual(move_result,[ false , "Invalid move"]);
     });
 
     it('Test if the turn is switched after a move', function(){
-      assert.equal(customized_chess.p1_turn, false);
+      assert.equal(customized_chess.p1_turn, true);
     });
 
     it('Test game status when in check', function(){
       assert.equal(customized_chess.game_status, customized_chess.ONGOING);
-      assert.equal(customized_chess.is_check, true);
+      assert.equal(customized_chess.is_check, false);
     });
 
 
     it('Test checkmate', function(){
-      var checkmate_board = new Chess(3, [new Piece("pawn", 0, 0, true), new Piece("queen", 0, 2, true), new Piece("king", 2,1, false) ], false);
+      var checkmate_board = new Chess(3, [new Piece("pawn", 0, 0, false), new Piece("queen", 0, 2, false), new Piece("king", 2,1, true) ], true);
       checkmate_board.move(2,1,1,0);
       checkmate_board.move(0,2,1,1);
 
-      assert.equal(checkmate_board.game_status, checkmate_board.P1_WIN);
+      assert.equal(checkmate_board.game_status, checkmate_board.P2_WIN);
     });
     it('Test stalemate (draw game)', function(){
       var stalemate_board = new Chess(3, [new Piece("king", 2, 0, true), new Piece("queen", 1,2, false) ]);
@@ -760,29 +760,29 @@ describe('Integration Test using Request Handler', function(){
   describe('Chess move related tests', function(){
     it("User1 makes a valid move in their turn", function(){
       var move_result = request_handler.make_move("1,3,3,3", created_user);
-      assert.deepEqual(move_result,  {success: true, msg: "Success move!"});
+      assert.deepEqual(move_result,  {success: false, msg: "Invalid move! This is not your chess piece"});
     });
 
     it("User1 makes a valid move, but not in their turn", function(){
       var move_result = request_handler.make_move("1,4,3,4", created_user);
-      assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
+      assert.deepEqual(move_result,  {success: false, msg: "Invalid move! This is not your chess piece"});
     });
 
     it("User2 makes a invalid move, in their turn", function(){
       var move_result = request_handler.make_move("1,???,3,4", created_user2);
-      assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
+      assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
 
       move_result = request_handler.make_move("1,???,3,4", created_user2);
-      assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
+      assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
 
       move_result = request_handler.make_move(null, created_user2);
-      assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
+      assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
 
     });
 
     it("User2 makes a valid move, in their turn", function(){
       var move_result = request_handler.make_move("6,0,4,0", created_user2);
-      assert.deepEqual(move_result,  {success: true, msg: "Success move!"});
+      assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
     });
     it("User3 makes a valid move, in their turn, but the game is paused", function(){
       var move_result = request_handler.make_move("1,3,3,3", created_user3);
