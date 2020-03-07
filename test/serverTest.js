@@ -145,6 +145,31 @@ describe('Individual Components Unit Test', function(){
       join_room_result = room_manager.join_room(null, room.room_number);
       assert.deepEqual(join_room_result, { success: false, msg: "Failed to authenticate the user"});
     });
+
+    it('Unanthenticated user quits room', function(){
+      var quit_room_result = room_manager.quit_room("some unauthenticated user");
+      assert.deepEqual(quit_room_result, { success: false, msg: "Failed to authenticate the user"});
+    });
+    it('User quits room', function(){
+      var new_user = room_manager.create_new_user();
+      var new_user2 = room_manager.create_new_user();
+      room_manager.create_room(new_user);
+      var room = room_manager.get_user_room(new_user);
+      room_manager.join_room(new_user2, room.room_number);
+
+      var quit_room_result = room_manager.quit_room(new_user);
+      assert.deepEqual(quit_room_result, { success: true, msg: "Success to quit room!"});
+
+      quit_room_result = room_manager.quit_room(new_user2);
+      assert.deepEqual(quit_room_result, { success: true, msg: "Success to quit room!"});
+
+    });
+    it('User quits room without enter a room', function(){
+      var new_user = room_manager.create_new_user();
+      var quit_room_result = room_manager.quit_room(new_user);
+      assert.deepEqual(quit_room_result, { success: false, msg:  "You did not enter a room!"});
+    });
+
   });
 
     describe('Game Manager Test', function(){
@@ -755,6 +780,29 @@ describe('Integration Test using Request Handler', function(){
       join_room_result = request_handler.join_room(null, room.room_number);
       assert.deepEqual(join_room_result, { success: false, msg: "Failed to authenticate the user"});
     });
+    it('Unanthenticated user quits room', function(){
+      var quit_room_result = request_handler.quit_room("some unauthenticated user");
+      assert.deepEqual(quit_room_result, { success: false, msg: "Failed to authenticate the user"});
+    });
+    it('User quits room', function(){
+      var new_user = request_handler.create_new_user();
+      var new_user2 = request_handler.create_new_user();
+      request_handler.create_room(new_user);
+      var room = request_handler.get_user_room(new_user);
+      request_handler.join_room(new_user2, room.room_number);
+
+      var quit_room_result = request_handler.quit_room(new_user);
+      assert.deepEqual(quit_room_result, { success: true, msg: "Success to quit room!"});
+
+      quit_room_result = request_handler.quit_room(new_user2);
+      assert.deepEqual(quit_room_result, { success: true, msg: "Success to quit room!"});
+
+    });
+    it('User quits room without enter a room', function(){
+      var new_user = request_handler.create_new_user();
+      var quit_room_result = request_handler.quit_room(new_user);
+      assert.deepEqual(quit_room_result, { success: false, msg:  "You did not enter a room!"});
+    });
   });
 
   describe('Chess move related tests', function(){
@@ -769,15 +817,14 @@ describe('Integration Test using Request Handler', function(){
     });
 
     it("User2 makes a invalid move, in their turn", function(){
-      var move_result = request_handler.make_move("1,???,3,4", created_user2);
-      assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
+      var move_result = request_handler.make_move("1,???,3,4", created_user);
+      assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
 
-      move_result = request_handler.make_move("1,???,3,4", created_user2);
-      assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
+      move_result = request_handler.make_move("1,???,3,4", created_user);
+      assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
 
-      move_result = request_handler.make_move(null, created_user2);
-      assert.deepEqual(move_result,  {success: false, msg: "This is your opponent turn, please wait!"});
-
+      move_result = request_handler.make_move(null, created_user);
+      assert.deepEqual(move_result,  {success: false, msg: "Invalid move format!"});
     });
 
     it("User2 makes a valid move, in their turn", function(){
