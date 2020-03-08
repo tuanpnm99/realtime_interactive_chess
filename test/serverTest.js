@@ -67,7 +67,7 @@ describe('Individual Components Unit Test', function(){
     });
     it('User1 creates rejoins the created room', function(){
       var join_room_result = room_manager.join_room(created_user, room.room_number);
-      assert.deepEqual(join_room_result, {success: true, msg: "Success to join!"});
+      assert.deepEqual(join_room_result, {success: true, msg: "You have joined the room successfully!"});
     });
 
     it('User2 joins room with user1, game should be ready to start', function(){
@@ -698,7 +698,7 @@ describe('Integration Test using Request Handler', function(){
     });
     it('User1 creates rejoins the created room', function(){
       var join_room_result = request_handler.join_room(created_user, room.room_number);
-      assert.deepEqual(join_room_result, {success: true, msg: "Success to join!"});
+      assert.deepEqual(join_room_result, {success: true, msg: "You have joined the room successfully!"});
     });
 
     it('User2 joins room with user1, game should be ready to start', function(){
