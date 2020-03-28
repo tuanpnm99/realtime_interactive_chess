@@ -128,7 +128,7 @@ class RoomManager{
 
       //delete the mapping
       room.pause = true;
-      delete this.USER_TO_ROOM[user_id];
+      this.USER_TO_ROOM[user_id] = null;
     }
     return {
       success: true,

@@ -32,6 +32,22 @@ app.get('/', function(req, res){
 
 });
 
+
+app.get('/signin', function(req, res){
+
+  session(req, res, () => {
+    var user_id = req.session.user_id;
+    console.log("USER ID: ", user_id);
+    if(!request_handler.authenticate_user(user_id).success)
+      req.session.user_id = request_handler.create_new_user();
+
+    res.send("SOME RESPONSE FROM SERVER")
+
+  });
+
+});
+
+
 app.get("/game_page", function(req, res){
   session(req, res, () => {
     var user_id = req.session.user_id;
@@ -65,11 +81,10 @@ io.on('connection', function(socket){
   console.log('a user connected with id: ' + socket.id);
 
   socket.on('create', function(input){
-    var username = input.username;
+    var username = (input == null)? null: input.username;
     var user_id = req.session.user_id;
-    console.log(user_id + "wants to create new room with username " + username);
     var create_room_result = request_handler.create_room(user_id, username);
-
+    console.log(user_id + "wants to create new room with username " + username, create_room_result);
     if(!create_room_result.success){
       io.to(socket.id).emit('msg', get_response(false, create_room_result.msg, null));
       return;
@@ -78,7 +93,7 @@ io.on('connection', function(socket){
     var new_room = request_handler.get_user_room(user_id);
 
     socket.join(new_room);
-
+    console.log("SUCCESS to create room!", new_room.room_number);
     io.to(socket.id).emit('join', "/game_page");
 
   })
@@ -93,6 +108,7 @@ io.on('connection', function(socket){
       io.to(socket.id).emit('msg', get_response(false, join_room_result.msg, null));
       return;
     }
+
 
     io.to(socket.id).emit('join', "game_page");
 
@@ -124,7 +140,6 @@ io.on('connection', function(socket){
 
   })
   socket.on('move', function(move_string){
-
     var user_id = req.session.user_id;
     var is_player1 = request_handler.is_player1(user_id);
     var move_result = request_handler.make_move(move_string, user_id);
@@ -147,7 +162,7 @@ io.on('connection', function(socket){
   socket.on('quit', function(){
     var user_id = req.session.user_id;
     var result = request_handler.quit_room(user_id);
-
+    console.log(user_id, "wants to quit room", result);
     io.to(socket.id).emit('quit', get_response(result.success, null, {msg: result.msg}));
   });
 
